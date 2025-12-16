@@ -1,0 +1,54 @@
+.settings {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+
+        list-style: none;
+        margin: 0;
+
+        width: 100%;
+        height: 100%;
+
+        padding: 0.625rem;
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+
+        background: var(--second-surface-color);
+
+        width: 100%;
+
+        gap: 0.625rem;
+        padding: 0.625rem;
+        border-radius: var(--border-radius);
+
+        &__title {
+            margin: 0;
+        }
+
+        &__content {
+            display: flex;
+            flex-direction: column;
+
+            gap: 0.625rem;
+        }
+
+        &__actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.3125rem;
+
+            & > input {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,0 +1,38 @@
+.item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    background: var(--second-surface-color);
+    border-radius: var(--border-radius);
+    padding: 0.625rem;
+
+    .content {
+        display: flex;
+        flex-direction: row;
+
+        & > img {
+            width: 4.375rem;
+            height: auto;
+            margin-right: 0.625rem;
+            border-radius: var(--border-radius) + 0.625rem;
+        }
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3125rem;
+
+        .button {
+            padding: 0.9375rem;
+
+            &:nth-child(2){
+                background: #c1121f;
+            }
+        }
+    }
+}

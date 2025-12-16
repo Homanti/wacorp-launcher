@@ -1,0 +1,86 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+
+    background: var(--second-surface-color);
+    height: 100%;
+
+    z-index: 0;
+
+    padding: 0.9375rem;
+
+    border-radius: 0 var(--border-radius) 0 0;
+}
+
+.account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.625rem;
+    margin: 0.625rem 0;
+
+    .avatar {
+        width: 5rem;
+        height: 5rem;
+        border-radius: var(--border-radius);
+    }
+
+    & > h2 {
+        margin: 0;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
+
+.nav {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.navItem {
+    position: relative;
+
+    margin: 0.3125rem 0;
+    padding: 0.625rem 1.875rem;
+
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    background: transparent;
+
+    text-decoration: none;
+    color: inherit;
+
+    &:visited {
+        color: inherit;
+    }
+}
+
+.navItemContent {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+}
+
+.activeBackground {
+    display: block;
+    position: absolute;
+
+    z-index: -1;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    pointer-events: none;
+
+    border-radius: var(--border-radius);
+    background: var(--surface-color);
+}

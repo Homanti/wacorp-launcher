@@ -1,0 +1,74 @@
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+        gap: 0.4375rem;
+
+        & > h2 {
+            margin: 0;
+        }
+    }
+
+    &__footer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3125rem;
+
+        & > p {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        & > a {
+            text-decoration: none;
+        }
+    }
+
+    &__button {
+        width: 100%;
+    }
+
+    &__input {
+        width: 100%;
+    }
+
+    &__textarea {
+        min-width: 100%;
+        max-width: 100%;
+        height: 6.25rem;
+        resize: none;
+    }
+
+    &__checkbox {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: start;
+        gap: 0.3125rem;
+
+        margin: 0.3125rem 0;
+
+        & a {
+            text-decoration: none;
+        }
+    }
+}

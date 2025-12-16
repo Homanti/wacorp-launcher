@@ -1,0 +1,88 @@
+.home {
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    height: 100%;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+
+        padding: 0 0.625rem 0.625rem 0.625rem;
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+
+            background: url("../../assets/home/background.png") no-repeat center center;
+            background-size: cover;
+
+            justify-content: end;
+
+            padding: 0.625rem;
+
+            width: 100%;
+            height: 100%;
+
+            border-radius: var(--border-radius);
+            overflow: hidden;
+
+            z-index: 1;
+
+            &__content {
+                display: flex;
+                flex-direction: column;
+
+                align-items: start;
+                justify-content: end;
+
+                gap: 0.3125rem;
+                margin-bottom: 0.625rem;
+
+                width: 100%;
+                height: 100%;
+
+                & > h2 {
+                    margin: 0;
+                }
+
+                & > p {
+                    margin: 0;
+                    color: var(--secondary-color);
+                }
+            }
+
+            &__footer {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+                justify-content: start;
+
+                gap: 0.625rem;
+
+                .launchButton {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 150px;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+                pointer-events: none;
+                border-radius: inherit;
+                z-index: -1;
+            }
+        }
+    }
+}
