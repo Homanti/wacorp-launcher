@@ -1,10 +1,13 @@
 import styles from "./Home.module.scss";
 import Button from "../../components/Button/Button.tsx";
 import {Folder} from "lucide-react";
-import useProgressBarStore from "../../store/useProgressBarStore";
+import useLaunchButton from "../../store/useLaunchButton";
+import {useSettingsStore} from "../../store/useSettingsStore";
 
 const Home = () => {
-    const isVisible = useProgressBarStore(state => state.isVisible);
+    const disabled = useLaunchButton(state => state.disabled);
+    const text = useLaunchButton(state => state.text);
+    const selectedRam = useSettingsStore(s => s.selectedRam);
 
     return (
         <main className={styles.home}>
@@ -19,8 +22,8 @@ const Home = () => {
                         <Button onClick={() => window.api.openGameDir()}>
                             <Folder />
                         </Button>
-                        <Button className={styles.launchButton} onClick={() => window.api.minecraftLaunch()} disabled={isVisible}>
-                            Запустить
+                        <Button className={styles.launchButton} onClick={() => window.api.minecraftLaunch(selectedRam)} disabled={disabled}>
+                            {text}
                         </Button>
                     </div>
                 </div>

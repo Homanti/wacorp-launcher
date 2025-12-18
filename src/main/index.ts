@@ -1,7 +1,8 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import {app, BrowserWindow, ipcMain, Menu, shell} from 'electron';
 import path from 'node:path';
 import Minecraft from "./minecraft";
-import { promises as fs } from "node:fs";
+import {promises as fs} from "node:fs";
+import os from "node:os";
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -31,9 +32,9 @@ const createWindow = () => {
         BrowserWindow.fromWebContents(event.sender)?.close();
     });
 
-    ipcMain.handle('launcher:launch', () => {
+    ipcMain.handle('launcher:launch', (_event, memory: number) => {
         console.log('Launching minecraft...');
-        minecraft.launchMinecraft();
+        minecraft.launchMinecraft(memory);
     })
 
     ipcMain.handle('launcher:openGameDir', async () => {
@@ -43,10 +44,17 @@ const createWindow = () => {
         await fs.mkdir(dir, { recursive: true });
         await shell.openPath(dir);
     })
+
+    ipcMain.handle('launcher:getTotalRam', async () => {
+        return os.totalmem() / 1024 / 1024;
+    })
+
+    return win;
 };
 
 app.whenReady().then(() => {
     createWindow();
+    Menu.setApplicationMenu(!app.isPackaged ? Menu.buildFromTemplate([{role: "toggleDevTools"}]) : null);
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();

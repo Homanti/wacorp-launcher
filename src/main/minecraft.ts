@@ -13,7 +13,7 @@ class Minecraft {
         this.win = win;
     }
     
-    async launchMinecraft() {
+    async launchMinecraft(memory: number) {
         const launch = new Launch();
         let mc;
 
@@ -49,8 +49,8 @@ class Minecraft {
             },
 
             memory: {
-                min: '2G',
-                max: '4G'
+                min: '1600M',
+                max: memory + 'M',
             },
 
             // GAME_ARGS: ['--quickPlayMultiplayer "localhost:25565"']
@@ -95,6 +95,7 @@ class Minecraft {
             if (!started) {
                 started = true;
                 this.win.webContents.send("launcher:setProgressBarVisible", false);
+                this.win.webContents.send("launcher:useLaunchButton", true, "Запускается");
             }
             console.log(e);
         })
@@ -102,6 +103,7 @@ class Minecraft {
         launch.on('close', code => {
             console.log(code);
             started = false;
+            this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
         });
 
         launch.on('error', err => {

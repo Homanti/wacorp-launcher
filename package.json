@@ -19,6 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "electron-updater": "^6.6.2",
     "lucide-react": "^0.522.0",
     "minecraft-java-core": "^4.2.3",
     "motion": "^12.18.1",

@@ -6,8 +6,13 @@ type LauncherProgress = { progress: number; size: number; element: string };
 contextBridge.exposeInMainWorld('api', {
     minimize: () => ipcRenderer.invoke('win:minimize'),
     close: () => ipcRenderer.invoke('win:close'),
-    minecraftLaunch: () => ipcRenderer.invoke('launcher:launch'),
+    minecraftLaunch: (memory: number) => ipcRenderer.invoke('launcher:launch', memory),
     openGameDir: () => ipcRenderer.invoke('launcher:openGameDir'),
+
+    getTotalRam: async () => {
+        const ramInfo: number = await ipcRenderer.invoke('launcher:getTotalRam');
+        return ramInfo;
+    },
 
     onProgress: (cb: (data: LauncherProgress) => void) => {
         const handler = (_event: unknown, data: LauncherProgress) => cb(data);
@@ -43,6 +48,16 @@ contextBridge.exposeInMainWorld('api', {
 
         return () => {
             ipcRenderer.removeListener("launcher:setProgressBarVisible", handler);
+        };
+    },
+
+    onLaunchButton: (cb: (disabled: boolean, text?: string) => void) => {
+        const handler = (_event: unknown, disabled: boolean, text?: string) => cb(disabled, text);
+
+        ipcRenderer.on("launcher:useLaunchButton", handler);
+
+        return () => {
+            ipcRenderer.removeListener("launcher:useLaunchButton", handler);
         };
     },
 });
