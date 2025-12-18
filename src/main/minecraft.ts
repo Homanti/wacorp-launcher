@@ -52,17 +52,14 @@ class Minecraft {
                 min: '1600M',
                 max: memory + 'M',
             },
-
-            // GAME_ARGS: ['--quickPlayMultiplayer "localhost:25565"']
         }
 
         let started = false;
+        let lastSent = 0;
 
         launch.on('extract', extract => {
             console.log(extract);
         });
-
-        let lastSent = 0;
 
         launch.on('progress', (progress, size, element) => {
             console.log(`Downloading ${element} ${Math.round((progress / size) * 100)}%`);

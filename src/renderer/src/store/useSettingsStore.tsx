@@ -12,6 +12,6 @@ export const useSettingsStore = create<SettingsState>()(
             selectedRam: 0,
             setSelectedRam: (v) => set({ selectedRam: v }),
         }),
-        { name: "settings" } // ключ в storage
+        { name: "settings" }
     )
 );

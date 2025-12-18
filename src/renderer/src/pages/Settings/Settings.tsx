@@ -20,7 +20,7 @@ const Settings = () => {
             setSelectedRam(next);
             setRamInputValue(next);
         })();
-    }, [])
+    }, [selectedRam, setSelectedRam])
 
     return (
         <main className={styles.settings}>
