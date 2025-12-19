@@ -16,13 +16,13 @@ const Sidebar = () => {
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
-                <img src={avatar} className={styles.avatar}/>
+                <img src={avatar} className={styles.avatar} alt="avatar"/>
                 <h2>Homanti</h2>
             </div>
 
             <nav className={styles.nav}>
                 {routes.map((route) => (
-                    <NavLink to={route.path} className={styles.navItem}>
+                    <NavLink key={route.path} to={route.path} className={styles.navItem}>
                         <span className={styles.navItemContent}>
                             {route.icon}
                             {route.label}

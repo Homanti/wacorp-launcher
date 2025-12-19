@@ -1,8 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 console.log('PRELOAD LOADED, contextIsolated=', process.contextIsolated);
 
-type LauncherProgress = { progress: number; size: number; element: string };
-
 contextBridge.exposeInMainWorld('api', {
     minimize: () => ipcRenderer.invoke('win:minimize'),
     close: () => ipcRenderer.invoke('win:close'),
@@ -14,40 +12,13 @@ contextBridge.exposeInMainWorld('api', {
         return ramInfo;
     },
 
-    onProgress: (cb: (data: LauncherProgress) => void) => {
-        const handler = (_event: unknown, data: LauncherProgress) => cb(data);
-        ipcRenderer.on("launcher:progress", handler);
+    onProgressBar: (cb: (visible: boolean, description?: string, percent?: number) => void) => {
+        const handler = (_event: unknown, visible: boolean, description: string, percent?: number) => cb(visible, description, percent);
+
+        ipcRenderer.on("launcher:useProgressBar", handler);
 
         return () => {
-            ipcRenderer.removeListener("launcher:progress", handler);
-        };
-    },
-
-    onChecking: (cb: (data: LauncherProgress) => void) => {
-        const handler = (_event: unknown, data: LauncherProgress) => cb(data);
-        ipcRenderer.on("launcher:checking", handler);
-
-        return () => {
-            ipcRenderer.removeListener("launcher:checking", handler);
-        };
-    },
-
-    onPatching: (cb: () => void) => {
-        const handler = () => cb();
-        ipcRenderer.on("launcher:patching", handler);
-
-        return () => {
-            ipcRenderer.removeListener("launcher:patching", handler);
-        };
-    },
-
-    onProgressBarVisible: (cb: (visible: boolean) => void) => {
-        const handler = (_event: unknown, visible: boolean) => cb(visible);
-
-        ipcRenderer.on("launcher:setProgressBarVisible", handler);
-
-        return () => {
-            ipcRenderer.removeListener("launcher:setProgressBarVisible", handler);
+            ipcRenderer.removeListener("launcher:useProgressBar", handler);
         };
     },
 

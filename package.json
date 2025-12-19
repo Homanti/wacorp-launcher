@@ -19,6 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "electron-updater": "^6.6.2",
     "lucide-react": "^0.522.0",
     "minecraft-java-core": "^4.2.3",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/adm-zip": "^0.5.7",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^5.1.2",

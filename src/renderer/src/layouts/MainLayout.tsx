@@ -19,8 +19,7 @@ const pageVariants = {
 
 const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
     const progressBarisVisible = useProgressBarStore(state => state.isVisible)
-    const progress = useProgressBarStore(state => state.progress)
-    const maxValue = useProgressBarStore(state => state.maxValue)
+    const percent = useProgressBarStore(state => state.percent)
     const description = useProgressBarStore(state => state.description)
 
     return (
@@ -49,7 +48,7 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
                             animate={{height: "auto"}}
                             exit={{height: 0}}
                         >
-                            <ProgressBar progress={progress} max={maxValue} description={description}/>
+                            <ProgressBar percent={percent} description={description}/>
                         </motion.div>
                     }
                 </AnimatePresence>

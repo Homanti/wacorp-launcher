@@ -1,11 +1,8 @@
 import {create} from "zustand";
 
 type progressBarStore = {
-    progress: number,
-    setProgress: (progress: number) => void,
-
-    maxValue: number,
-    setMaxValue: (maxValue: number) => void,
+    percent: number,
+    setPercent: (progress: number) => void,
 
     description?: string,
     setDescription: (description: string) => void,
@@ -15,11 +12,8 @@ type progressBarStore = {
 }
 
 export const useProgressBarStore = create<progressBarStore>((set) => ({
-    progress: 0,
-    setProgress: (progress: number) => set({progress}),
-
-    maxValue: 0,
-    setMaxValue: (maxValue: number) => set({maxValue}),
+    percent: 0,
+    setPercent: (percent: number) => set({percent}),
 
     description: "",
     setDescription: (description: string) => set({description}),
