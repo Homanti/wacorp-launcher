@@ -6,6 +6,9 @@ contextBridge.exposeInMainWorld('api', {
     minecraftLaunch: (memory: number) => ipcRenderer.invoke('launcher:launch', memory),
     openGameDir: () => ipcRenderer.invoke('launcher:openGameDir'),
 
+    reinstall: (what: "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:reinstall', what),
+    deleteGameDir: () => ipcRenderer.invoke('launcher:deleteGameDir'),
+
     getTotalRam: async () => {
         const ramInfo: number = await ipcRenderer.invoke('launcher:getTotalRam');
         return ramInfo;

@@ -14,7 +14,7 @@ function ProgressBar({ percent, description }: ProgressBarProps) {
                 className={`${styles.progress} ${indeterminate ? styles.indeterminate : ''}`}
                 style={indeterminate ? undefined : { width: `${percent}%` }}
             />
-            <span className={styles.text}>{description && !indeterminate ? `${description}: ` : description ? description : ''} {indeterminate ? '...' : `${percent}%`}</span>
+            <span className={styles.text}>{description && !indeterminate ? `${description}: ` : description ? description + "..." : ''} {!indeterminate && `${percent}%`}</span>
         </div>
     );
 }

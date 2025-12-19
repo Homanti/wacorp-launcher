@@ -13,7 +13,7 @@ function AccountItem({children}: {children:string}) {
             <div className={styles.actions}>
                 <Button className={styles.button}><Play /></Button>
                 <Button className={styles.button}><Pencil /></Button>
-                <Button className={styles.button}><Trash /></Button>
+                <Button className={`${styles.button} ${styles.dangerButton}`}><Trash /></Button>
             </div>
         </li>
     );

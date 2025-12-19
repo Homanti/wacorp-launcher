@@ -24,12 +24,12 @@ const Settings = () => {
 
     return (
         <main className={styles.settings}>
-            <ul className={styles.settings__content}>
-                <li className={styles.settings__item}>
-                    <h2 className={styles.settings__item__title}>Настройки памяти</h2>
-                    <div className={styles.settings__item__content}>
+            <ul className={styles.settingsContent}>
+                <li className={styles.settingsItem}>
+                    <h2 className={styles.title}>Настройки памяти</h2>
+                    <div className={styles.content}>
                         <label htmlFor="ram-input">Выделяемый объем RAM (МБ). {`Максимум ${Math.round(totalRam)}МБ`}</label>
-                        <div className={styles.settings__item__actions}>
+                        <div className={styles.actions}>
                             <Input min={MIN_RAM} value={ramInputValue} max={totalRam} type="number" placeholder={`Максимум ${Math.round(totalRam)}МБ`} id="ram-input"
                                    onChange={(e) => {
                                        const raw = Number(e.target.value);
@@ -50,6 +50,24 @@ const Settings = () => {
                                 }}
                             >
                                 Сохранить
+                            </Button>
+                        </div>
+                    </div>
+                </li>
+
+                <li className={styles.settingsItem}>
+                    <h2 className={styles.title}>Управление игрой</h2>
+                    <div className={styles.content}>
+                        <label htmlFor="ram-input">Вы можете переустановить или удалить Minecraft и зависимости.</label>
+                        <div className={styles.actions}>
+                            <Button onClick={() => window.api.reinstall("mods")}>
+                                Переустановить моды
+                            </Button>
+                            <Button onClick={() => window.api.reinstall("resourcepacks")}>
+                                Переустановить ресурс пак
+                            </Button>
+                            <Button onClick={() => window.api.deleteGameDir()} className={styles.dangerButton}>
+                                Удалить Minecraft
                             </Button>
                         </div>
                     </div>

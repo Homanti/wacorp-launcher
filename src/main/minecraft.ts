@@ -113,31 +113,31 @@ class Minecraft {
 
             try {
                 await fs.unlink(path.join(rpDir, rp));
-                console.log("Deleted RP:", rp);
+                console.log("Deleted resourcepacks dir:", rp);
             } catch (e) {
-                console.error("Can't delete RP:", e);
+                console.error("Can't delete resourcepacks dir:", e);
             }
         }
 
         try {
-            await downloadFile(new URL("https://github.com/Homanti/wacorp-assets/raw/refs/heads/main/WacoRP%20resourcepacks.zip"), path.join(rpDir, "rp.zip"), (percent) => {
+            await downloadFile(new URL("https://github.com/Homanti/wacorp-assets/raw/refs/heads/main/WacoRP%20resourcepacks.zip"), path.join(rpDir, "resourcepacks.zip"), (percent) => {
                 if (percent !== null) {
                     this.win.webContents.send("launcher:useLaunchButton", true, "Установка ресурспака.");
                     this.win.webContents.send("launcher:useProgressBar", true, `Установка ресурспака`, percent);
-                    console.log(`Downloading RP ${percent}%`);
                 }
             })
         } catch (e) {
-            console.error("Can't download RP: ", e);
+            console.error("Can't download resourcepack: ", e);
         }
 
         try {
             this.win.webContents.send("launcher:useProgressBar", true, `Распаковка`, null);
-            await extractZip(path.join(rpDir, "rp.zip"), rpDir);
-            console.log("Extracted RP");
-            await fs.unlink(path.join(rpDir, "rp.zip"));
+            await extractZip(path.join(rpDir, "resourcepacks.zip"), rpDir);
+            console.log("Extracted resourcepacks.zip");
+
+            await fs.unlink(path.join(rpDir, "resourcepacks.zip"));
         } catch (e) {
-            console.error("Can't extract RP: ", e);
+            console.error("Can't extract resourcepacks.zip: ", e);
         }
 
         const newAssetsVersion = {rp_version: actual, pointblank_version: assetsVersion.pointblank_version};
@@ -253,6 +253,24 @@ class Minecraft {
         this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
 
         await launch.Launch(opt);
+    }
+
+    async reinstall(what: "mods" | "resourcepacks") {
+        if (what === "mods") {
+            const modsDir = path.join(this.minecraftPath, 'mods');
+            await fs.rm(modsDir, {recursive: true, force: true}).catch(() => {
+                console.error("Can't delete mods dir");
+            })
+            await this.downloadModsIfMissing()
+
+        } else if (what === "resourcepacks") {
+            const rpDir = path.join(this.minecraftPath, 'resourcepacks');
+            await fs.rm(rpDir, {recursive: true, force: true}).catch(() => {
+                console.error("Can't delete resourcepacks dir");
+            })
+
+            await this.downloadRPIIfMissing()
+        }
     }
 }
 

@@ -49,6 +49,14 @@ const createWindow = () => {
         return os.totalmem() / 1024 / 1024;
     })
 
+    ipcMain.handle('launcher:reinstall', async (_event, what: "mods" | "resourcepacks") => {
+        await minecraft.reinstall(what);
+    })
+
+    ipcMain.handle('launcher:deleteGameDir', async () => {
+        await fs.rm(minecraft.minecraftPath, {recursive: true, force: true}).catch((e) => {console.error(e)});
+    })
+
     return win;
 };
 
