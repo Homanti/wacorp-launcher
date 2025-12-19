@@ -6,6 +6,7 @@
     z-index: 0;
 
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+    overflow: hidden;
 }
 
 .progress {
@@ -32,4 +33,15 @@
 
     font-size: 1rem;
     mix-blend-mode: difference;
+}
+
+.indeterminate {
+    width: 40%;
+    left: 0;
+    animation: indeterminate 1.2s linear infinite;
+}
+
+@keyframes indeterminate {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(350%); }
 }

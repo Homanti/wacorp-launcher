@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-console.log('PRELOAD LOADED, contextIsolated=', process.contextIsolated);
 
 contextBridge.exposeInMainWorld('api', {
     minimize: () => ipcRenderer.invoke('win:minimize'),
@@ -12,8 +11,8 @@ contextBridge.exposeInMainWorld('api', {
         return ramInfo;
     },
 
-    onProgressBar: (cb: (visible: boolean, description?: string, percent?: number) => void) => {
-        const handler = (_event: unknown, visible: boolean, description: string, percent?: number) => cb(visible, description, percent);
+    onProgressBar: (cb: (visible: boolean, description?: string, percent?: number | null) => void) => {
+        const handler = (_event: unknown, visible: boolean, description: string, percent?: number | null) => cb(visible, description, percent);
 
         ipcRenderer.on("launcher:useProgressBar", handler);
 

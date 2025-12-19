@@ -11,7 +11,7 @@ declare global {
 
             getTotalRam: () => Promise<number>;
 
-            onProgressBar: (cb: (isVisible: boolean, description?: string, percent?: number) => void) => () => void;
+            onProgressBar: (cb: (isVisible: boolean, description?: string, percent?: number | null) => void) => () => void;
             onLaunchButton: (cb: (disabled: boolean, text?: string) => void) => () => void;
         };
     }

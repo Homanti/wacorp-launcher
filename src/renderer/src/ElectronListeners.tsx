@@ -6,13 +6,12 @@ function ElectronListeners() {
     useEffect(() => {
         try {
             const offProgressBar = window.api.onProgressBar((isVisible, description, percent) => {
-                if (description && percent) {
+                if (description && percent !== undefined) {
                     useProgressBarStore.setState(
                         state => ({...state, isVisible, description: description, percent: percent})
                     );
                 } else {
                     useProgressBarStore.setState(state => ({...state, isVisible}));
-                    console.log(useProgressBarStore.getState().isVisible);
                 }
             });
 
