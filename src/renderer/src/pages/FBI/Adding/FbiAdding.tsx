@@ -12,9 +12,9 @@ const FbiAdding = () => {
                 <Input className={styles.input} placeholder="ФИО*" />
                 <Input className={styles.input} placeholder="Дата рождение*" />
                 <Input className={styles.input} placeholder="Место жительства" />
-                <Input className={styles.input} placeholder="Индификатор паспорта*" />
-                <Input className={styles.input} placeholder="Индификатор водительского удостоверение" />
-                <Input className={styles.input} placeholder="Индификатор удостоверение на оружие" />
+                <Input className={styles.input} placeholder="Идентификатор паспорта*" />
+                <Input className={styles.input} placeholder="Идентификатор водительского удостоверение" />
+                <Input className={styles.input} placeholder="Идентификатор удостоверение на оружие" />
                 <label>* - обязательно</label>
                 <Button className={styles.button}>Добавить</Button>
 
