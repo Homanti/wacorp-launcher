@@ -83,29 +83,30 @@ class Minecraft {
     }
 
     async downloadRPIIfMissing() {
-        const actualAssetsVersion = await fetch('https://pastebin.com/raw/70N3V9Nj'
+        const actualAssetsJson = await fetch('https://pastebin.com/raw/70N3V9Nj'
         ).then(res => res.json());
 
         const rpDir = path.join(this.minecraftPath, 'resourcepacks');
         const pbDir = path.join(this.minecraftPath, 'pointblank');
 
-        const assetsVersion = await readJsonFile<{rp_version: number, pointblank_version: number}>(path.join(this.minecraftPath, 'wacorp-assets-version.json'))
+        const localAssetsJson = await readJsonFile<{rp_version: number, pointblank_version: number}>(path.join(this.minecraftPath, 'wacorp-assets-version.json'))
             .catch(() => ({ rp_version: null, pointblank_version: null }));
 
-        const rpActual = actualAssetsVersion.rp_version;
-        const rpLocal = assetsVersion.rp_version;
+        const rpActual = actualAssetsJson.rp_version;
+        const rpLocal = localAssetsJson.rp_version;
 
-        const pbActual = actualAssetsVersion.pointblank_version;
-        const pbLocal = assetsVersion.pointblank_version;
+        const pbActual = actualAssetsJson.pointblank_version;
+        const pbLocal = localAssetsJson.pointblank_version;
 
-        const rpFilesNames = ['WacoRP Part 1.zip', 'WacoRP Part 2.zip', 'WacoRP Part 3.zip'];
-        const pbFilesNames = ['EasternEuropeanArsenal_0.0.7_1.20.1.zip', 'pbext-ext 1.0.zip'];
+        const rpFilesNames = actualAssetsJson.rp_files as string[];
+        const pbFilesNames = actualAssetsJson.pb_files as string[];
 
         const rpDiskFiles = await fs.readdir(rpDir).catch(() => [] as string[]);
         const rpDiskSet = new Set(rpDiskFiles);
 
         const pbDiskFiles = await fs.readdir(pbDir).catch(() => [] as string[]);
         const pbDiskSet = new Set(pbDiskFiles);
+
 
         const isRpExists = rpFilesNames.every(rp => rpDiskSet.has(rp));
         const isPbExists = pbFilesNames.every(pb => pbDiskSet.has(pb));
@@ -155,7 +156,7 @@ class Minecraft {
 
         } if (pbActual !== pbLocal || !isPbExists) {
             for (const pb of pbFilesNames) {
-                if (!rpDiskSet.has(pb)) continue;
+                if (!pbDiskSet.has(pb)) continue;
 
                 try {
                     await fs.unlink(path.join(pbDir, pb));
