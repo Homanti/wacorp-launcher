@@ -9,7 +9,7 @@ const FbiSearching = () => {
             <form className={styles.form}>
                 <h2>Поиск в реестре</h2>
                 <Input className={styles.input} placeholder="ФИО" />
-                <Input className={styles.input} placeholder="Дата рождение" />
+                <Input className={styles.input} placeholder="Дата рождения" />
                 <Input className={styles.input} placeholder="Место жительства" />
                 <Input className={styles.input} placeholder="Идентификатор паспорта" />
                 <Input className={styles.input} placeholder="Идентификатор водительского удостоверение" />
