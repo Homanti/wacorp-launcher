@@ -87,60 +87,107 @@ class Minecraft {
         ).then(res => res.json());
 
         const rpDir = path.join(this.minecraftPath, 'resourcepacks');
+        const pbDir = path.join(this.minecraftPath, 'pointblank');
 
         const assetsVersion = await readJsonFile<{rp_version: number, pointblank_version: number}>(path.join(this.minecraftPath, 'wacorp-assets-version.json'))
             .catch(() => ({ rp_version: null, pointblank_version: null }));
 
-        const actual = actualAssetsVersion.rp_version;
-        const local = assetsVersion.rp_version;
+        const rpActual = actualAssetsVersion.rp_version;
+        const rpLocal = assetsVersion.rp_version;
+
+        const pbActual = actualAssetsVersion.pointblank_version;
+        const pbLocal = assetsVersion.pointblank_version;
 
         const rpFilesNames = ['WacoRP Part 1.zip', 'WacoRP Part 2.zip', 'WacoRP Part 3.zip'];
+        const pbFilesNames = ['EasternEuropeanArsenal_0.0.7_1.20.1.zip', 'pbext-ext 1.0.zip'];
 
-        const diskFiles = await fs.readdir(rpDir).catch(() => [] as string[]);
-        const diskSet = new Set(diskFiles);
+        const rpDiskFiles = await fs.readdir(rpDir).catch(() => [] as string[]);
+        const rpDiskSet = new Set(rpDiskFiles);
 
-        if (actual === local && rpFilesNames.every(rp => diskSet.has(rp))) return;
+        const pbDiskFiles = await fs.readdir(pbDir).catch(() => [] as string[]);
+        const pbDiskSet = new Set(pbDiskFiles);
+
+        const isRpExists = rpFilesNames.every(rp => rpDiskSet.has(rp));
+        const isPbExists = pbFilesNames.every(pb => pbDiskSet.has(pb));
+
+        if (rpActual === rpLocal && pbActual === pbLocal && isRpExists && isPbExists) return;
 
         try {
             await fs.mkdir(rpDir, { recursive: true });
-            console.log("Created mods dir");
+            await fs.mkdir(pbDir, { recursive: true });
+            console.log("Created resourcepack and pointblank dir");
         } catch (e) {
-            console.error("Can't create mods dir: ", e);
+            console.error("Can't create resourcepack dir: ", e);
         }
 
-        for (const rp of rpFilesNames) {
-            if (!diskSet.has(rp)) continue;
+        if (rpActual !== rpLocal || !isRpExists) {
+            for (const rp of rpFilesNames) {
+                if (!rpDiskSet.has(rp)) continue;
+
+                try {
+                    await fs.unlink(path.join(rpDir, rp));
+                    console.log("Deleted resourcepack: ", rp);
+                } catch (e) {
+                    console.error("Can't delete resourcepack:", e);
+                }
+            }
 
             try {
-                await fs.unlink(path.join(rpDir, rp));
-                console.log("Deleted resourcepacks dir:", rp);
+                await downloadFile(new URL("https://github.com/Homanti/wacorp-assets/raw/refs/heads/main/WacoRP%20resourcepacks.zip"), path.join(rpDir, "resourcepacks.zip"), (percent) => {
+                    if (percent !== null) {
+                        this.win.webContents.send("launcher:useLaunchButton", true, "Установка ресурспака.");
+                        this.win.webContents.send("launcher:useProgressBar", true, `Установка ресурспака`, percent);
+                    }
+                })
             } catch (e) {
-                console.error("Can't delete resourcepacks dir:", e);
+                console.error("Can't download resourcepack: ", e);
+            }
+
+            try {
+                this.win.webContents.send("launcher:useProgressBar", true, `Распаковка`, null);
+                await extractZip(path.join(rpDir, "resourcepacks.zip"), rpDir);
+                console.log("Extracted resourcepacks.zip");
+
+                await fs.unlink(path.join(rpDir, "resourcepacks.zip"));
+            } catch (e) {
+                console.error("Can't extract resourcepacks.zip: ", e);
+            }
+
+        } if (pbActual !== pbLocal || !isPbExists) {
+            for (const pb of pbFilesNames) {
+                if (!rpDiskSet.has(pb)) continue;
+
+                try {
+                    await fs.unlink(path.join(pbDir, pb));
+                    console.log("Deleted pointblank pack: ", pb);
+                } catch (e) {
+                    console.error("Can't delete pointblank pack:", e);
+                }
+            }
+
+            try {
+                await downloadFile(new URL("https://github.com/Homanti/wacorp-assets/raw/refs/heads/main/pointblank.zip"), path.join(pbDir, "pointblank.zip"), (percent) => {
+                    if (percent !== null) {
+                        this.win.webContents.send("launcher:useLaunchButton", true, "Установка ресурспака.");
+                        this.win.webContents.send("launcher:useProgressBar", true, `Установка ресурспака`, percent);
+                    }
+                })
+            } catch (e) {
+                console.error("Can't download pointblank pack: ", e);
+            }
+
+            try {
+                this.win.webContents.send("launcher:useProgressBar", true, `Распаковка`, null);
+                await extractZip(path.join(pbDir, "pointblank.zip"), pbDir);
+                console.log("Extracted pointblank.zip");
+
+                await fs.unlink(path.join(pbDir, "pointblank.zip"));
+            } catch (e) {
+                console.error("Can't extract pointblank.zip: ", e);
             }
         }
 
-        try {
-            await downloadFile(new URL("https://github.com/Homanti/wacorp-assets/raw/refs/heads/main/WacoRP%20resourcepacks.zip"), path.join(rpDir, "resourcepacks.zip"), (percent) => {
-                if (percent !== null) {
-                    this.win.webContents.send("launcher:useLaunchButton", true, "Установка ресурспака.");
-                    this.win.webContents.send("launcher:useProgressBar", true, `Установка ресурспака`, percent);
-                }
-            })
-        } catch (e) {
-            console.error("Can't download resourcepack: ", e);
-        }
-
-        try {
-            this.win.webContents.send("launcher:useProgressBar", true, `Распаковка`, null);
-            await extractZip(path.join(rpDir, "resourcepacks.zip"), rpDir);
-            console.log("Extracted resourcepacks.zip");
-
-            await fs.unlink(path.join(rpDir, "resourcepacks.zip"));
-        } catch (e) {
-            console.error("Can't extract resourcepacks.zip: ", e);
-        }
-
-        const newAssetsVersion = {rp_version: actual, pointblank_version: assetsVersion.pointblank_version};
+        const newAssetsVersion = {rp_version: rpActual, pointblank_version: pbActual};
         await writeJsonFile(path.join(this.minecraftPath, 'wacorp-assets-version.json'), newAssetsVersion);
 
         this.win.webContents.send("launcher:useProgressBar", false);
@@ -265,8 +312,14 @@ class Minecraft {
 
         } else if (what === "resourcepacks") {
             const rpDir = path.join(this.minecraftPath, 'resourcepacks');
+            const pbDir = path.join(this.minecraftPath, 'pointblank');
+
             await fs.rm(rpDir, {recursive: true, force: true}).catch(() => {
                 console.error("Can't delete resourcepacks dir");
+            })
+
+            await fs.rm(pbDir, {recursive: true, force: true}).catch(() => {
+                console.error("Can't delete pointblank dir");
             })
 
             await this.downloadRPIIfMissing()
