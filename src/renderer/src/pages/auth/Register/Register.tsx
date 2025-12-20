@@ -1,8 +1,8 @@
-import Button from "../../components/Button/Button";
-import Input from "../../components/Input/Input";
 import {Link} from "react-router-dom";
 import styles from "./Register.module.scss";
-import Textarea from "../../components/Textarea/Textarea";
+import Input from "../../../components/Input/Input";
+import Textarea from "../../../components/Textarea/Textarea";
+import Button from "../../../components/Button/Button";
 
 const Register = () => {
     return (
@@ -23,7 +23,7 @@ const Register = () => {
 
                 <div className={styles.footer}>
                     <p>Уже есть аккаунт?</p>
-                    <Link to="/login">Войти</Link>
+                    <Link to="/auth/login">Войти</Link>
                 </div>
             </form>
         </main>

@@ -1,45 +1,51 @@
-import {NavLink, useLocation} from 'react-router-dom';
-import styles from './Sidebar.module.scss';
-import {motion} from "motion/react";
-import {Home, Settings, User} from "lucide-react";
+import { NavLink, useLocation, useMatch } from "react-router-dom";
+import styles from "./Sidebar.module.scss";
+import { motion } from "motion/react";
+import { Home, Settings, Siren, User } from "lucide-react";
 import avatar from "../../assets/avatar.png";
 
 const routes = [
-    {"path": "/", "label": "Главная", "icon": <Home/>},
-    {"path": "/accounts", "label": "Аккаунты", icon: <User/>},
-    {"path": "/settings", "label": "Настройки", icon: <Settings/>},
+    { path: "/", label: "Главная", icon: <Home />, end: true },
+    { path: "/accounts", label: "Аккаунты", icon: <User />, end: true },
+    { path: "/settings", label: "Настройки", icon: <Settings />, end: true },
+    { path: "/fbi/searching", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*" },
 ];
 
 const Sidebar = () => {
-    const {pathname} = useLocation();
+    const { pathname } = useLocation();
+    const fbiMatch = useMatch("/fbi/*");
 
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
-                <img src={avatar} className={styles.avatar} alt="avatar"/>
+                <img src={avatar} className={styles.avatar} alt="avatar" />
                 <h2>Homanti</h2>
             </div>
 
             <nav className={styles.nav}>
-                {routes.map((route) => (
-                    <NavLink key={route.path} to={route.path} className={styles.navItem}>
-                        <span className={styles.navItemContent}>
-                            {route.icon}
-                            {route.label}
-                        </span>
+                {routes.map((route) => {
+                    const isActive = route.match ? !!fbiMatch : (route.end ? pathname === route.path : pathname.startsWith(route.path));
 
-                        {pathname === route.path && (
-                            <motion.div
-                                layoutId="activeBackground"
-                                className={styles.activeBackground}
-                                transition={{type: "spring", stiffness: 500, damping: 40}}
-                            />
-                        )}
-                    </NavLink>
-                ))}
+                    return (
+                        <NavLink key={route.path} to={route.path} end={route.end} className={styles.navItem}>
+                            <span className={styles.navItemContent}>
+                                {route.icon}
+                                {route.label}
+                            </span>
+
+                            {isActive && (
+                                <motion.div
+                                    layoutId="activeBackground"
+                                    className={styles.activeBackground}
+                                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                                />
+                            )}
+                        </NavLink>
+                    );
+                })}
             </nav>
         </div>
     );
-}
+};
 
 export default Sidebar;

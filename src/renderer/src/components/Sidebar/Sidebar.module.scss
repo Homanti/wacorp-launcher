@@ -66,6 +66,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
+
+    min-width: max-content;
 }
 
 .activeBackground {

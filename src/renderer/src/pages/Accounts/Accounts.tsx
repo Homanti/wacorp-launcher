@@ -9,7 +9,7 @@ const Accounts = () => {
             <section className={styles.accounts__content}>
                 <header className={styles.accounts__header}>
                     <h1>Аккаунты</h1>
-                    <Link to="/login">
+                    <Link to="/auth/login">
                         <Button>Добавить аккаунт</Button>
                     </Link>
                 </header>

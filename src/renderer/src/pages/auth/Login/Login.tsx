@@ -1,7 +1,7 @@
 import styles from "./Login.module.scss";
-import Button from "../../components/Button/Button";
-import Input from "../../components/Input/Input";
 import {Link} from "react-router-dom";
+import Input from "../../../components/Input/Input";
+import Button from "../../../components/Button/Button";
 
 const Login = () => {
     return (
@@ -13,7 +13,7 @@ const Login = () => {
                 <Button className={styles.button}>Войти</Button>
                 <div className={styles.footer}>
                     <p>Нет аккаунта?</p>
-                    <Link to="/register">Регистрация</Link>
+                    <Link to="/auth/register">Регистрация</Link>
                 </div>
             </form>
         </main>
