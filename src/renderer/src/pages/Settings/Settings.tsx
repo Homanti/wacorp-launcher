@@ -58,7 +58,7 @@ const Settings = () => {
                 <li className={styles.settingsItem}>
                     <h2 className={styles.title}>Управление игрой</h2>
                     <div className={styles.content}>
-                        <label htmlFor="ram-input">Вы можете переустановить или удалить Minecraft и зависимости.</label>
+                        <label htmlFor="ram-input">Инструменты для переустановки модов и ресурспака, а также полного удаления Minecraft.</label>
                         <div className={styles.actions}>
                             <Button onClick={() => window.api.reinstall("mods")}>
                                 Переустановить моды
