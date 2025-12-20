@@ -16,6 +16,8 @@ const FbiAdding = () => {
                 <Input className={styles.input} placeholder="Идентификатор водительского удостоверение" />
                 <Input className={styles.input} placeholder="Идентификатор удостоверение на оружие" />
                 <label>* - обязательно</label>
+
+                <Button className={styles.button}>Загрузить фотографию</Button>
                 <Button className={styles.button}>Добавить</Button>
 
                 <div className={styles.footer}>
