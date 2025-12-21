@@ -1,4 +1,4 @@
-import {Launch, Mojang} from "minecraft-java-core";
+import {Launch} from "minecraft-java-core";
 import {app, BrowserWindow} from 'electron';
 import path from "node:path"
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -9,6 +9,12 @@ import downloadFile from "./utils/downloadFile";
 import * as fs from 'node:fs/promises';
 import extractZip from "./utils/extractZip";
 import {writeFile} from "node:fs/promises";
+
+export type launchOptions = {
+    username: string;
+    authToken: string;
+    dedicatedRam: number;
+}
 
 class Minecraft {
     version: {mc: string, forge: string};
@@ -107,7 +113,6 @@ class Minecraft {
         const pbDiskFiles = await fs.readdir(pbDir).catch(() => [] as string[]);
         const pbDiskSet = new Set(pbDiskFiles);
 
-
         const isRpExists = rpFilesNames.every(rp => rpDiskSet.has(rp));
         const isPbExists = pbFilesNames.every(pb => pbDiskSet.has(pb));
 
@@ -120,6 +125,8 @@ class Minecraft {
         } catch (e) {
             console.error("Can't create resourcepack dir: ", e);
         }
+
+        const newAssetsVersion = {rp_version: rpLocal, pointblank_version: pbLocal};
 
         if (rpActual !== rpLocal || !isRpExists) {
             for (const rp of rpFilesNames) {
@@ -150,6 +157,7 @@ class Minecraft {
                 console.log("Extracted resourcepacks.zip");
 
                 await fs.unlink(path.join(rpDir, "resourcepacks.zip"));
+                newAssetsVersion.rp_version = rpActual;
             } catch (e) {
                 console.error("Can't extract resourcepacks.zip: ", e);
             }
@@ -183,26 +191,36 @@ class Minecraft {
                 console.log("Extracted pointblank.zip");
 
                 await fs.unlink(path.join(pbDir, "pointblank.zip"));
+                newAssetsVersion.pointblank_version = pbActual;
             } catch (e) {
                 console.error("Can't extract pointblank.zip: ", e);
             }
         }
 
-        const newAssetsVersion = {rp_version: rpActual, pointblank_version: pbActual};
         await writeJsonFile(path.join(this.minecraftPath, 'wacorp-assets-version.json'), newAssetsVersion);
 
         this.win.webContents.send("launcher:useProgressBar", false);
         this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
     }
     
-    async launchMinecraft(memory: number) {
-        let mc;
-        mc = await Mojang.login('Homanti');
+    async launchMinecraft(launchOptions: launchOptions) {
+        const username = launchOptions.username;
+        const uuid = launchOptions.authToken;
 
         const opt: LaunchOPTS = {
             timeout: 10000,
             path: this.minecraftPath,
-            authenticator: mc,
+            authenticator: {
+                access_token: uuid,
+                client_token: uuid,
+                uuid: uuid,
+                name: username,
+                user_properties: '{}',
+                meta: {
+                    online: false,
+                    type: 'Mojang'
+                }
+            },
             version: this.version.mc,
             detached: false,
             intelEnabledMac: true,
@@ -221,7 +239,6 @@ class Minecraft {
             javaPath: null,
             java: true,
 
-
             screen: {
                 width: null,
                 height: null,
@@ -230,7 +247,7 @@ class Minecraft {
 
             memory: {
                 min: '1600M',
-                max: memory + 'M',
+                max: launchOptions.dedicatedRam + 'M',
             },
         }
 

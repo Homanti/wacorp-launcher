@@ -1,12 +1,18 @@
 /// <reference types="vite/client" />
 export {};
 
+type launchOptions = {
+    username: string;
+    authToken: string;
+    dedicatedRam: number;
+}
+
 declare global {
     interface Window {
         api: {
             minimize: () => Promise<void>;
             close: () => Promise<void>;
-            minecraftLaunch: (memory: number) => Promise<void>;
+            minecraftLaunch: (launchOptions: launchOptions) => Promise<void>;
             openGameDir: () => Promise<void>;
 
             reinstall: (what: "mods" | "resourcepacks") => Promise<void>;

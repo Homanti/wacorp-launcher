@@ -1,14 +1,19 @@
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import styles from "./Register.module.scss";
 import Input from "../../../components/Input/Input";
 import Textarea from "../../../components/Textarea/Textarea";
 import Button from "../../../components/Button/Button";
 
 const Register = () => {
+    const location = useLocation();
+
+    const mode = (location.state)?.mode;
+    const isAddAccountFlow = mode === "addAccount";
+
     return (
         <main className={styles.register}>
-            <form className={styles.form}>
-                <h2>Регистрация аккаунта</h2>
+            <form className={`${styles.form} ${!isAddAccountFlow && styles.noAccount}`}>
+                <h2>Регистрация аккаунта WacoRP</h2>
                 <Input className={styles.input} type="text" placeholder="Введите ваш логин"/>
                 <Input className={styles.input} type="password" placeholder="Введите ваш пароль"/>
                 <Textarea className={styles.textarea} placeholder="РП история вашего персонажа" />
@@ -23,9 +28,13 @@ const Register = () => {
 
                 <div className={styles.footer}>
                     <p>Уже есть аккаунт?</p>
-                    <Link to="/auth/login">Войти</Link>
+                    <Link state={{mode: mode}} to="/auth/login">Войти</Link>
                 </div>
             </form>
+
+            {!isAddAccountFlow && (
+                <div className={styles.noAccount} />
+            )}
         </main>
     );
 }

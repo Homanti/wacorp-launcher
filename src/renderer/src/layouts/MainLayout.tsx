@@ -5,6 +5,7 @@ import styles from "./MainLayout.module.scss";
 import {motion, AnimatePresence} from "motion/react";
 import ProgressBar from "../components/ProgressBar/ProgressBar";
 import useProgressBarStore from "../store/useProgressBarStore";
+import {useAuthStore} from "../store/useAuthStore";
 
 type MainLayoutProps = {
     children: ReactNode;
@@ -21,6 +22,9 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
     const progressBarisVisible = useProgressBarStore(state => state.isVisible)
     const percent = useProgressBarStore(state => state.percent)
     const description = useProgressBarStore(state => state.description)
+    const accounts = useAuthStore(state => state.accounts);
+
+    const showSidebar = accounts.length > 0 || isSidebar;
 
     return (
         <>
@@ -28,7 +32,7 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
                 <Header/>
 
                 <div className={styles.mainLayout__content}>
-                    {isSidebar && <Sidebar/>}
+                    {showSidebar && <Sidebar/>}
                     <motion.div className={styles.animationWrapper}
                                 variants={pageVariants}
                                 initial="initial"

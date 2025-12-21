@@ -8,61 +8,35 @@ import Register from "./pages/auth/Register/Register";
 import FbiSearching from "./pages/FBI/Searching/FbiSearching";
 import FbiAdding from "./pages/FBI/Adding/FbiAdding";
 
+export const publicRoutes: RouteObject[] = [
+    { path: '/auth/login', element: <Login /> },
+    { path: '/auth/register', element: <Register /> },
+];
+
+export const protectedRoutes: RouteObject[] = [
+    { path: '/', element: <Home /> },
+    { path: '/accounts', element: <Accounts /> },
+    { path: '/settings', element: <Settings /> },
+    { path: '/fbi/searching', element: <FbiSearching /> },
+    { path: '/fbi/adding', element: <FbiAdding /> },
+];
+
 export const routes: RouteObject[] = [
-    {
-        path: '/',
+    ...publicRoutes.map(route => ({
+        path: route.path,
         element: (
-            <MainLayout isSidebar={true}>
-                <Home />
-            </MainLayout>
-        ),
-    },
-    {
-        path: '/accounts',
-        element: (
-            <MainLayout isSidebar={true}>
-                <Accounts />
-            </MainLayout>
-        ),
-    },
-    {
-        path: '/settings',
-        element: (
-            <MainLayout isSidebar={true}>
-                <Settings />
-            </MainLayout>
-        ),
-    },
-    {
-        path: '/auth/login',
-        element: (
-            <MainLayout>
-                <Login />
-            </MainLayout>
-        ),
-    },
-    {
-        path: '/auth/register',
-        element: (
-            <MainLayout>
-                <Register />
-            </MainLayout>
-        ),
-    },
-    {
-        path: '/fbi/searching',
-        element: (
-            <MainLayout>
-                <FbiSearching />
+            <MainLayout isSidebar={false}>
+                {route.element}
             </MainLayout>
         )
-    },
-    {
-        path: '/fbi/adding',
+    })),
+
+    ...protectedRoutes.map(route => ({
+        path: route.path,
         element: (
             <MainLayout>
-                <FbiAdding />
+                {route.element}
             </MainLayout>
         )
-    }
+    }))
 ];

@@ -2,19 +2,28 @@ import styles from './Accounts.module.scss';
 import Button from "../../components/Button/Button";
 import {Link} from "react-router-dom";
 import AccountItem from "./AccountItem/AccountItem";
+import {useAuthStore} from "../../store/useAuthStore";
+import {AnimatePresence} from "motion/react";
 
 const Accounts = () => {
+    const accounts = useAuthStore(s => s.accounts);
+
     return (
         <main className={styles.accounts}>
             <section className={styles.accounts__content}>
                 <header className={styles.accounts__header}>
                     <h1>Аккаунты</h1>
-                    <Link to="/auth/login">
+                    <Link to="/auth/login" state={{ mode: "addAccount" }}>
                         <Button>Добавить аккаунт</Button>
                     </Link>
                 </header>
+
                 <ul className={styles.accounts__list}>
-                    <AccountItem>Homanti</AccountItem>
+                    <AnimatePresence initial={false} mode={"popLayout"}>
+                        {accounts.map((account) => (
+                            <AccountItem key={account.username}>{account.username}</AccountItem>
+                        ))}
+                    </AnimatePresence>
                 </ul>
             </section>
         </main>

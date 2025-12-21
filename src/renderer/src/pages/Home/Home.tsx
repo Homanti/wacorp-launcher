@@ -3,11 +3,14 @@ import Button from "../../components/Button/Button.tsx";
 import {Folder} from "lucide-react";
 import useLaunchButton from "../../store/useLaunchButton";
 import {useSettingsStore} from "../../store/useSettingsStore";
+import {useAuthStore} from "../../store/useAuthStore";
 
 const Home = () => {
     const disabled = useLaunchButton(state => state.disabled);
     const text = useLaunchButton(state => state.text);
+
     const selectedRam = useSettingsStore(s => s.selectedRam);
+    const selectedAccount = useAuthStore(s => s.selectedAccount);
 
     return (
         <main className={styles.home}>
@@ -22,7 +25,15 @@ const Home = () => {
                         <Button onClick={() => window.api.openGameDir()}>
                             <Folder />
                         </Button>
-                        <Button className={styles.launchButton} onClick={() => window.api.minecraftLaunch(selectedRam)} disabled={disabled}>
+                        <Button className={styles.launchButton} onClick={() => {
+                            if (!selectedAccount) return;
+
+                            return window.api.minecraftLaunch({
+                                username: selectedAccount.username,
+                                authToken: selectedAccount.authToken,
+                                dedicatedRam: selectedRam
+                            });
+                        }} disabled={disabled}>
                             {text}
                         </Button>
                     </div>

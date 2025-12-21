@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type {launchOptions} from "../main/minecraft";
 
 contextBridge.exposeInMainWorld('api', {
     minimize: () => ipcRenderer.invoke('win:minimize'),
     close: () => ipcRenderer.invoke('win:close'),
-    minecraftLaunch: (memory: number) => ipcRenderer.invoke('launcher:launch', memory),
+    minecraftLaunch: (launchOptions: launchOptions) => ipcRenderer.invoke('launcher:launch', launchOptions),
     openGameDir: () => ipcRenderer.invoke('launcher:openGameDir'),
 
     reinstall: (what: "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:reinstall', what),

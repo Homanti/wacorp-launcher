@@ -1,3 +1,5 @@
+import AuthProvider from "./AuthProvider";
+
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
 
@@ -23,7 +25,9 @@ import {HashRouter} from "react-router-dom";
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <HashRouter>
-          <App />
+          <AuthProvider>
+              <App />
+          </AuthProvider>
       </HashRouter>
   </StrictMode>,
 )

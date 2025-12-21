@@ -1,6 +1,6 @@
 import {app, BrowserWindow, ipcMain, Menu, shell} from 'electron';
 import path from 'node:path';
-import Minecraft from "./minecraft";
+import Minecraft, {type launchOptions} from "./minecraft";
 import {promises as fs} from "node:fs";
 import os from "node:os";
 
@@ -32,9 +32,9 @@ const createWindow = () => {
         BrowserWindow.fromWebContents(event.sender)?.close();
     });
 
-    ipcMain.handle('launcher:launch', (_event, memory: number) => {
+    ipcMain.handle('launcher:launch', (_event, launchOptions: launchOptions) => {
         console.log('Launching minecraft...');
-        minecraft.launchMinecraft(memory);
+        minecraft.launchMinecraft(launchOptions);
     })
 
     ipcMain.handle('launcher:openGameDir', async () => {

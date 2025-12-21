@@ -3,6 +3,7 @@ import styles from "./Sidebar.module.scss";
 import { motion } from "motion/react";
 import { Home, Settings, Siren, User } from "lucide-react";
 import avatar from "../../assets/avatar.png";
+import {useAuthStore} from "../../store/useAuthStore";
 
 const routes = [
     { path: "/", label: "Главная", icon: <Home />, end: true },
@@ -14,12 +15,13 @@ const routes = [
 const Sidebar = () => {
     const { pathname } = useLocation();
     const fbiMatch = useMatch("/fbi/*");
+    const selectedAccount = useAuthStore(s => s.selectedAccount);
 
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
                 <img src={avatar} className={styles.avatar} alt="avatar" />
-                <h2>Homanti</h2>
+                <h2>{selectedAccount?.username}</h2>
             </div>
 
             <nav className={styles.nav}>
