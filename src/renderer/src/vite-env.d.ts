@@ -3,7 +3,8 @@ export {};
 
 type launchOptions = {
     username: string;
-    authToken: string;
+    accessToken: string;
+    uuid: string;
     dedicatedRam: number;
 }
 

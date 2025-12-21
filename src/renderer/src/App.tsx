@@ -1,6 +1,5 @@
 import { routes } from "./routes.tsx";
 import { useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import { useRoutes } from "react-router-dom";
 import ElectronListeners from "./ElectronListeners";
 
@@ -10,9 +9,7 @@ function App() {
 
   return (
     <>
-        <AnimatePresence mode="wait">
-            {element && <div className="animated-route" key={location.pathname}>{element}</div>}
-        </AnimatePresence>
+        {element}
         <ElectronListeners />
     </>
   );

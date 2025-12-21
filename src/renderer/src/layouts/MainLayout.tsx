@@ -6,16 +6,11 @@ import {motion, AnimatePresence} from "motion/react";
 import ProgressBar from "../components/ProgressBar/ProgressBar";
 import useProgressBarStore from "../store/useProgressBarStore";
 import {useAuthStore} from "../store/useAuthStore";
+import {Outlet, useLocation} from "react-router-dom";
 
 type MainLayoutProps = {
     children: ReactNode;
     isSidebar?: boolean;
-};
-
-const pageVariants = {
-    initial: {opacity: 0, y: 30},
-    animate: {opacity: 1, y: 0},
-    exit: {opacity: 0, y: 30},
 };
 
 const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
@@ -23,25 +18,38 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
     const percent = useProgressBarStore(state => state.percent)
     const description = useProgressBarStore(state => state.description)
     const accounts = useAuthStore(state => state.accounts);
+    const routerLocation = useLocation();
 
     const showSidebar = accounts.length > 0 || isSidebar;
+
+    const pageVariants = {
+        initial: {opacity: 0, y: showSidebar ? 30 : 0},
+        animate: {opacity: 1, y: 0},
+        exit: {opacity: 0, y: showSidebar ? 30 : 0},
+    };
 
     return (
         <>
             <div className={styles.mainLayout}>
                 <Header/>
 
-                <div className={styles.mainLayout__content}>
+                <div className={styles.content}>
                     {showSidebar && <Sidebar/>}
-                    <motion.div className={styles.animationWrapper}
-                                variants={pageVariants}
-                                initial="initial"
-                                animate="animate"
-                                exit="exit"
-                                transition={{type: "spring", stiffness: 500, damping: 40}}
-                    >
-                        {children}
-                    </motion.div>
+
+                    <AnimatePresence mode={"popLayout"} initial={false}>
+                        <motion.div
+                            className={styles.animationWrapper}
+                            key={routerLocation.pathname}
+                            variants={pageVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={{type: "spring", stiffness: 500, damping: 40}}
+                        >
+
+                            {children ?? <Outlet />}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
 
                 <AnimatePresence initial={false}>

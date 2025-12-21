@@ -12,7 +12,8 @@ import {writeFile} from "node:fs/promises";
 
 export type launchOptions = {
     username: string;
-    authToken: string;
+    accessToken: string;
+    uuid: string;
     dedicatedRam: number;
 }
 
@@ -205,14 +206,15 @@ class Minecraft {
     
     async launchMinecraft(launchOptions: launchOptions) {
         const username = launchOptions.username;
-        const uuid = launchOptions.authToken;
+        const uuid = launchOptions.uuid;
+        const accessToken = launchOptions.accessToken;
 
         const opt: LaunchOPTS = {
             timeout: 10000,
             path: this.minecraftPath,
             authenticator: {
-                access_token: uuid,
-                client_token: uuid,
+                access_token: accessToken,
+                client_token: accessToken,
                 uuid: uuid,
                 name: username,
                 user_properties: '{}',
@@ -234,7 +236,6 @@ class Minecraft {
 
             verify: false,
             ignored: ['loader', 'options.txt'],
-            args: [],
 
             javaPath: null,
             java: true,
@@ -249,6 +250,8 @@ class Minecraft {
                 min: '1600M',
                 max: launchOptions.dedicatedRam + 'M',
             },
+
+            GAME_ARGS: []
         }
 
         const launch = new Launch();

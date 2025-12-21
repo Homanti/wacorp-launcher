@@ -2,8 +2,9 @@ import { NavLink, useLocation, useMatch } from "react-router-dom";
 import styles from "./Sidebar.module.scss";
 import { motion } from "motion/react";
 import { Home, Settings, Siren, User } from "lucide-react";
-import avatar from "../../assets/avatar.png";
 import {useAuthStore} from "../../store/useAuthStore";
+import {useEffect, useState} from "react";
+import {extractHead} from "../../utils/extractHead";
 
 const routes = [
     { path: "/", label: "Главная", icon: <Home />, end: true },
@@ -16,11 +17,21 @@ const Sidebar = () => {
     const { pathname } = useLocation();
     const fbiMatch = useMatch("/fbi/*");
     const selectedAccount = useAuthStore(s => s.selectedAccount);
+    const [headSrc, setHeadSrc] = useState('');
+
+    useEffect(() => {
+        if (selectedAccount?.username) {
+            const skinUrl = `https://raw.githubusercontent.com/Homanti/wacorp-skins/main/${selectedAccount?.username}.png`;
+            extractHead(skinUrl)
+                .then((dataUrl: string) => setHeadSrc(dataUrl))
+                .catch(console.error);
+        }
+    }, [selectedAccount?.username]);
 
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
-                <img src={avatar} className={styles.avatar} alt="avatar" />
+                <img src={headSrc} className={styles.avatar} alt="avatar" />
                 <h2>{selectedAccount?.username}</h2>
             </div>
 

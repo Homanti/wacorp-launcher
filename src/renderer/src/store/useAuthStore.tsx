@@ -3,7 +3,8 @@ import { persist } from "zustand/middleware";
 
 type AuthAccount = {
     username: string;
-    authToken: string;
+    accessToken: string;
+    refreshToken: string;
 };
 
 type AuthStore = {
@@ -11,6 +12,8 @@ type AuthStore = {
     addAccount: (account: AuthAccount) => void;
     removeAccount: (username: string) => void;
     clearAccounts: () => void;
+
+    updateAccount: (account: AuthAccount) => void;
 
     selectedAccount: AuthAccount | null;
     setSelectedAccount: (username: string) => void;
@@ -48,6 +51,8 @@ export const useAuthStore = create<AuthStore>()(
                 }),
 
             clearAccounts: () => set({ accounts: [] }),
+
+            updateAccount: (account) => set((state) => ({ accounts: state.accounts.map(acc => acc.username === account.username ? account : acc) })),
 
             setSelectedAccount: (username) =>
                 set((state) => ({

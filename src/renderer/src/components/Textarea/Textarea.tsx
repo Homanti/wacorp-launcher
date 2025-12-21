@@ -2,11 +2,12 @@ import styles from "./Textarea.module.scss";
 
 type TextareaProps = {
     className?: string;
+    ref?: React.Ref<HTMLTextAreaElement>;
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-const Textarea = ({ className, ...props }: TextareaProps) => {
+const Textarea = ({ className, ref, ...props }: TextareaProps) => {
     return (
-        <textarea className={`${styles.textarea} ${className || ''}`} {...props} />
+        <textarea ref={ref} className={`${styles.textarea} ${className || ''}`} {...props} />
     );
 }
 
