@@ -209,6 +209,8 @@ class Minecraft {
         const uuid = launchOptions.uuid;
         const accessToken = launchOptions.accessToken;
 
+        const authLibDir = path.join(this.minecraftPath, 'mods', 'authlib-injector-1.2.7.jar');
+
         const opt: LaunchOPTS = {
             timeout: 10000,
             path: this.minecraftPath,
@@ -219,7 +221,7 @@ class Minecraft {
                 name: username,
                 user_properties: '{}',
                 meta: {
-                    online: false,
+                    online: true,
                     type: 'Mojang'
                 }
             },
@@ -251,7 +253,7 @@ class Minecraft {
                 max: launchOptions.dedicatedRam + 'M',
             },
 
-            GAME_ARGS: []
+            JVM_ARGS: [`-javaagent:${authLibDir}=http://127.0.0.1:8000`]
         }
 
         const launch = new Launch();
@@ -297,7 +299,7 @@ class Minecraft {
                 started = true;
 
                 this.win.webContents.send("launcher:useProgressBar", false);
-                this.win.webContents.send("launcher:useLaunchButton", true, "Запущен");
+                this.win.webContents.send("launcher:useLaunchButton", false, "Запущен");
             }
             console.log(e);
         })
@@ -315,10 +317,10 @@ class Minecraft {
             this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
         });
 
-        await this.downloadModsIfMissing()
-        await this.downloadRPIIfMissing()
+        // await this.downloadModsIfMissing()
+        // await this.downloadRPIIfMissing()
 
-        this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
+        // this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
 
         await launch.Launch(opt);
     }

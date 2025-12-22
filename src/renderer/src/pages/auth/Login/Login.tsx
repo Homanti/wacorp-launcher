@@ -4,12 +4,11 @@ import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
 import {useAuthStore} from "../../../store/useAuthStore";
 import {useRef} from "react";
-import {API_URL} from "../../../config/api.config";
 
 const Login = () => {
     const loginRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
-    const addAccount = useAuthStore(s => s.addAccount);
+    const login = useAuthStore(s => s.login);
 
     const location = useLocation();
 
@@ -18,28 +17,10 @@ const Login = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const login = loginRef.current?.value || "";
+        const username = loginRef.current?.value || "";
         const password = passwordRef.current?.value || "";
 
-        if (!login || !password) return;
-        if (login.length < 3 || login.length > 16) return;
-        if (password.length < 6 || password.length > 32) return;
-
-        console.log(login, password);
-
-        const response = await fetch(API_URL + "/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ username: login, password })
-        })
-
-        const data = await response.json();
-
-        if (response.ok) {
-            addAccount({ username: login, accessToken: data.access_token, refreshToken: data.refresh_token });
-        }
+        await login(username, password);
     };
 
     return (

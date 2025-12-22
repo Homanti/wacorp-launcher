@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
+    "axios": "^1.13.2",
     "electron-updater": "^6.6.2",
     "lucide-react": "^0.522.0",
     "minecraft-java-core": "^4.2.3",

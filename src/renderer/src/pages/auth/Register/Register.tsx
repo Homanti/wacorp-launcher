@@ -5,13 +5,12 @@ import Textarea from "../../../components/Textarea/Textarea";
 import Button from "../../../components/Button/Button";
 import {SkinPicker} from "./SkinPicker/SkinPicker";
 import {useRef, useState} from "react";
-import {API_URL} from "../../../config/api.config";
 import {useAuthStore} from "../../../store/useAuthStore";
 
 const Register = () => {
     const location = useLocation();
     const [skinFile, setSkinFile] = useState<File>();
-    const addAccount = useAuthStore(s => s.addAccount);
+    const register = useAuthStore(s => s.register);
 
     const loginRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
@@ -23,28 +22,19 @@ const Register = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const login = loginRef.current?.value || "";
+        const username = loginRef.current?.value || "";
         const password = passwordRef.current?.value || "";
         const rpHistory = rpHistoryRef.current?.value || "";
 
         const formData = new FormData();
-        formData.append('username', login);
+        formData.append('username', username);
         formData.append('password', password);
         formData.append('rp_history', rpHistory);
         if (skinFile) {
             formData.append('skin_file', skinFile);
         }
 
-        const response = await fetch(API_URL+ "/auth/register", {
-            method: "POST",
-            body: formData,
-        })
-
-        const data = await response.json();
-
-        if (response.ok) {
-            addAccount({ username: login, accessToken: data.access_token, refreshToken: data.refresh_token });
-        }
+        await register(formData);
     };
 
     return (

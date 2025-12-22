@@ -11,6 +11,26 @@ function AccountItem({children}: {children: string}) {
     const setSelectedAccount = useAuthStore(s => s.setSelectedAccount);
     const [headSrc, setHeadSrc] = useState('');
 
+    const accounts = useAuthStore(s => s.accounts);
+
+    const handleSelect = () => {
+        setSelectedAccount(children);
+
+        setTimeout(async () => {
+            const { validateAndRefresh } = useAuthStore.getState();
+            const account = accounts.find(acc => acc.username === children);
+            if (account) {
+                const validated = await validateAndRefresh(
+                    account.accessToken,
+                    account.refreshToken
+                );
+                if (!validated) {
+                    console.log('Session expired for', children);
+                }
+            }
+        });
+    };
+
     useEffect(() => {
         const skinUrl = `https://raw.githubusercontent.com/Homanti/wacorp-skins/main/${children}.png`;
         extractHead(skinUrl)
@@ -31,7 +51,7 @@ function AccountItem({children}: {children: string}) {
             </div>
 
             <div className={styles.actions}>
-                <Button className={styles.button} onClick={() => setSelectedAccount(children)}><Play /></Button>
+                <Button className={styles.button} onClick={handleSelect}><Play /></Button>
                 <Button className={styles.button}><Pencil /></Button>
                 <Button className={`${styles.button} ${styles.dangerButton}`} onClick={() => removeAccount(children)}><Trash /></Button>
             </div>
