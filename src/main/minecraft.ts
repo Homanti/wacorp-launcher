@@ -317,10 +317,10 @@ class Minecraft {
             this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
         });
 
-        // await this.downloadModsIfMissing()
-        // await this.downloadRPIIfMissing()
+        await this.downloadModsIfMissing()
+        await this.downloadRPIIfMissing()
 
-        // this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
+        this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
 
         await launch.Launch(opt);
     }
