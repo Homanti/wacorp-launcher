@@ -67,7 +67,7 @@ class Minecraft {
         }
 
         for (const mod of missing) {
-            const base = new URL('https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/mods/');
+            const base = new URL('https://pub-667cb3e69b324e049e8d10959a1d5bb9.r2.dev/');
             const modUrl = new URL(encodeURIComponent(mod), base);
 
             try {
@@ -253,7 +253,7 @@ class Minecraft {
                 max: launchOptions.dedicatedRam + 'M',
             },
 
-            JVM_ARGS: [`-javaagent:${authLibDir}=http://127.0.0.1:8000`]
+            JVM_ARGS: [`-javaagent:${authLibDir}=https://wacorp-api-production.up.railway.app`]
         }
 
         const launch = new Launch();
@@ -299,7 +299,7 @@ class Minecraft {
                 started = true;
 
                 this.win.webContents.send("launcher:useProgressBar", false);
-                this.win.webContents.send("launcher:useLaunchButton", false, "Запущен");
+                this.win.webContents.send("launcher:useLaunchButton", true, "Запущен");
             }
             console.log(e);
         })
