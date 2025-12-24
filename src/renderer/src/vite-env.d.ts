@@ -18,7 +18,7 @@ declare global {
 
             getServerStatus: () => Promise<number | boolean>;
 
-            reinstall: (what: "mods" | "resourcepacks") => Promise<void>;
+            delete: (what: "minecraft" | "mods" | "resourcepacks") => Promise<void>;
             deleteGameDir: () => Promise<void>;
 
             getTotalRam: () => Promise<number>;

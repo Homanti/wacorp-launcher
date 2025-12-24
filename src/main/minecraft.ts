@@ -4,11 +4,11 @@ import path from "node:path"
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import {LaunchOPTS} from "minecraft-java-core/build/Launch";
-import * as fs from 'node:fs/promises';
 import {writeFile} from "node:fs/promises";
 import {API_URL, SERVER_IP} from "../config/api.config";
-import MinecraftDownloader from "./MinecraftDownloader";
 import mc from "minecraftstatuspinger";
+import MinecraftChecker from "./MinecraftChecker";
+import log from "electron-log";
 
 export type launchOptions = {
     username: string;
@@ -20,12 +20,14 @@ export type launchOptions = {
 class Minecraft {
     version: {mc: string, forge: string};
     minecraftPath: string;
+    authLibDir: string;
     private win: BrowserWindow;
 
     constructor(win: BrowserWindow,version = {mc: "1.20.1", forge: "47.4.13"}, minecraftPath = path.join(app.getPath('appData'), '.wacorp')) {
         this.version = version;
         this.minecraftPath = minecraftPath;
         this.win = win;
+        this.authLibDir = path.join(this.minecraftPath, 'libraries', 'com', 'mojang', 'authlib', 'authlib-injector-1.2.7.jar');
     }
     
     async launchMinecraft(launchOptions: launchOptions) {
@@ -33,11 +35,10 @@ class Minecraft {
         const uuid = launchOptions.uuid;
         const accessToken = launchOptions.accessToken;
 
-        const authLibDir = path.join(this.minecraftPath, 'mods', 'authlib-injector-1.2.7.jar');
-
         const opt: LaunchOPTS = {
             timeout: 10000,
             path: this.minecraftPath,
+            url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
             authenticator: {
                 access_token: accessToken,
                 client_token: accessToken,
@@ -61,7 +62,7 @@ class Minecraft {
             },
 
             verify: false,
-            ignored: ['loader', 'options.txt'],
+            ignored: ['loader', 'options.txt', 'saves', 'screenshots', 'saros_road_signs_mod', 'pfm', 'logs', 'emotes', 'defaultconfigs', 'config', 'shaderpacks'],
 
             javaPath: null,
             java: true,
@@ -77,7 +78,7 @@ class Minecraft {
                 max: launchOptions.dedicatedRam + 'M',
             },
 
-            JVM_ARGS: [`-javaagent:${authLibDir}=${API_URL}`]
+            JVM_ARGS: [`-javaagent:${this.authLibDir}=${API_URL}`]
         }
 
         const launch = new Launch();
@@ -86,13 +87,13 @@ class Minecraft {
         let isOptionsCreated = false;
 
         launch.on('extract', extract => {
-            console.log(extract);
+            log.info(extract);
         });
 
         launch.on('progress', async (progress, size, element) => {
             const percent = Number(((progress / size) * 100).toFixed(2));
 
-            this.win.webContents.send("launcher:useProgressBar", true, `Установка игры. ${element}`, percent)
+            this.win.webContents.send("launcher:useProgressBar", true, `Установка игры: ${element}`, percent)
             this.win.webContents.send("launcher:useLaunchButton", true, "Установка...");
 
             if (!isOptionsCreated) {
@@ -112,7 +113,7 @@ class Minecraft {
         });
 
         launch.on('patch', patch => {
-            console.log(patch);
+            log.info(patch);
 
             this.win.webContents.send("launcher:useProgressBar", true, `Проверка файлов`, null)
             this.win.webContents.send("launcher:useLaunchButton", true, "Проверка файлов...");
@@ -126,57 +127,33 @@ class Minecraft {
                 this.win.webContents.send("launcher:useLaunchButton", true, "Запущен");
                 this.win.webContents.send("launcher:addNotification", "success", "Майнкрафт запущен");
             }
-            console.log(e);
+            log.info(e);
         })
 
         launch.on('close', code => {
-            console.log(code);
+            log.info(code);
             started = false;
 
             this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
         });
 
         launch.on('error', err => {
-            console.error(err);
+            log.error(err);
 
             this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
             this.win.webContents.send("launcher:addNotification", "error", "Неизвестная ошибка");
         });
 
-        const downloader = new MinecraftDownloader(this.win, this.minecraftPath);
+        const checker = new MinecraftChecker(this.win, this.minecraftPath);
 
-        await downloader.downloadModsIfMissing()
-        await downloader.downloadRPIIfMissing()
+        await checker.checkMods();
+        await checker.checkResourcePacks();
+        await checker.checkPointBlank();
 
         this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
 
+        log.info('Launching minecraft...');
         await launch.Launch(opt);
-    }
-
-    async reinstall(what: "mods" | "resourcepacks") {
-        const downloader = new MinecraftDownloader(this.win, this.minecraftPath);
-
-        if (what === "mods") {
-            const modsDir = path.join(this.minecraftPath, 'mods');
-            await fs.rm(modsDir, {recursive: true, force: true}).catch(() => {
-                console.error("Can't delete mods dir");
-            })
-            await downloader.downloadModsIfMissing()
-
-        } else if (what === "resourcepacks") {
-            const rpDir = path.join(this.minecraftPath, 'resourcepacks');
-            const pbDir = path.join(this.minecraftPath, 'pointblank');
-
-            await fs.rm(rpDir, {recursive: true, force: true}).catch(() => {
-                console.error("Can't delete resourcepacks dir");
-            })
-
-            await fs.rm(pbDir, {recursive: true, force: true}).catch(() => {
-                console.error("Can't delete pointblank dir");
-            })
-
-            await downloader.downloadRPIIfMissing()
-        }
     }
 
     async getServerStatus() {

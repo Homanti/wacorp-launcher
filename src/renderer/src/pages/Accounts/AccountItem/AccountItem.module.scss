@@ -11,12 +11,13 @@
     .content {
         display: flex;
         flex-direction: row;
-
-        & > img {
+        .avatar {
             width: 4.375rem;
             height: auto;
             margin-right: 0.625rem;
-            border-radius: var(--border-radius) + 0.625rem;
+
+            border-radius: var(--border-radius);
+            overflow: hidden;
         }
     }
 

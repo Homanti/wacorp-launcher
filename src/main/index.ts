@@ -3,6 +3,19 @@ import path from 'node:path';
 import Minecraft, {type launchOptions} from "./minecraft";
 import {promises as fs} from "node:fs";
 import os from "node:os";
+import log from 'electron-log';
+
+log.transports.file.resolvePathFn = () => {
+    const logDir = app.isPackaged
+        ? path.join(process.resourcesPath, 'logs')
+        : path.join(__dirname, '../../logs');
+    return path.join(logDir, 'main.log');
+};
+log.transports.file.level = 'info';
+log.transports.console.level = 'debug';
+Object.assign(console, log.functions);
+
+log.info('App starting...');
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -33,12 +46,11 @@ const createWindow = () => {
     });
 
     ipcMain.handle('launcher:launch', (_event, launchOptions: launchOptions) => {
-        console.log('Launching minecraft...');
         minecraft.launchMinecraft(launchOptions);
     })
 
     ipcMain.handle('launcher:openGameDir', async () => {
-        console.log('Opening game dir...');
+        log.info('Opening game dir...');
         const dir = minecraft.minecraftPath;
 
         await fs.mkdir(dir, { recursive: true });
@@ -49,16 +61,42 @@ const createWindow = () => {
         return os.totalmem() / 1024 / 1024;
     })
 
-    ipcMain.handle('launcher:reinstall', async (_event, what: "mods" | "resourcepacks") => {
-        await minecraft.reinstall(what);
-    })
+    ipcMain.handle('launcher:delete', async (_event, what: "minecraft" | "mods" | "resourcepacks") => {
+        if (what === "minecraft") {
 
+            try {
+                await fs.rm(minecraft.minecraftPath, {recursive: true, force: true});
+                win.webContents.send("launcher:addNotification", "success", "Minecraft успешно удален!");
+            } catch (e) {
+                log.error(e);
+                win.webContents.send("launcher:addNotification", "error", "Ошибка во время удаление Minecraft");
+            }
+
+        } else if (what === "mods") {
+            try {
+                await fs.rm(path.join(minecraft.minecraftPath, 'mods'), {recursive: true, force: true})
+                await fs.rm(minecraft.authLibDir, {recursive: true, force: true})
+
+                win.webContents.send("launcher:addNotification", "success", "Моды успешно удалены!");
+            } catch (e) {
+                log.error(e);
+                win.webContents.send("launcher:addNotification", "error", "Ошибка во время удаление модов");
+            }
+
+        } else if (what === "resourcepacks") {
+            try {
+                await fs.rm(path.join(minecraft.minecraftPath, 'resourcepacks'), {recursive: true, force: true})
+                await fs.rm(path.join(minecraft.minecraftPath, 'pointblank'), {recursive: true, force: true})
+
+                win.webContents.send("launcher:addNotification", "success", "Ресурс паки успешно удалены!");
+            } catch (e) {
+                log.error(e);
+                win.webContents.send("launcher:addNotification", "error", "Ошибка во время удаление ресурс паков");
+            }
+        }
+    })
     ipcMain.handle('launcher:getServerStatus', async () => {
         return minecraft.getServerStatus();
-    })
-
-    ipcMain.handle('launcher:deleteGameDir', async () => {
-        await fs.rm(minecraft.minecraftPath, {recursive: true, force: true}).catch((e) => {console.error(e)});
     })
 
     return win;

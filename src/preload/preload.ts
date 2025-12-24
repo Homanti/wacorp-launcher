@@ -8,8 +8,7 @@ contextBridge.exposeInMainWorld('api', {
     minecraftLaunch: (launchOptions: launchOptions) => ipcRenderer.invoke('launcher:launch', launchOptions),
     openGameDir: () => ipcRenderer.invoke('launcher:openGameDir'),
 
-    reinstall: (what: "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:reinstall', what),
-    deleteGameDir: () => ipcRenderer.invoke('launcher:deleteGameDir'),
+    delete: (what: "minecraft" | "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:delete', what),
 
     getServerStatus: async () => {
         return await ipcRenderer.invoke('launcher:getServerStatus');

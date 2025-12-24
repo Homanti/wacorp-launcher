@@ -3,9 +3,8 @@ import styles from "./Sidebar.module.scss";
 import { motion } from "motion/react";
 import { Home, Settings, Siren, User } from "lucide-react";
 import {useAuthStore} from "../../store/useAuthStore";
-import {useEffect, useState} from "react";
-import {extractHead} from "../../utils/extractHead";
 import {useNotificationsStore, type Notification} from "../../store/useNotificationsStore";
+import Avatar from "../Avatar/Avatar";
 
 const routes = [
     { path: "/", label: "Главная", icon: <Home />, end: true },
@@ -18,79 +17,72 @@ const Sidebar = () => {
     const { pathname } = useLocation();
     const fbiMatch = useMatch("/fbi/*");
     const selectedAccount = useAuthStore(s => s.selectedAccount);
-    const [headSrc, setHeadSrc] = useState('');
 
     const addNotification = useNotificationsStore(s => s.addNotification);
 
     let clickCount = 0;
 
-    useEffect(() => {
-        if (selectedAccount?.username) {
-            const skinUrl = `https://raw.githubusercontent.com/Homanti/wacorp-skins/main/${selectedAccount?.username}.png`;
-            extractHead(skinUrl)
-                .then((dataUrl: string) => setHeadSrc(dataUrl))
-                .catch(console.error);
-        }
-    }, [selectedAccount?.username]);
-
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
-                <img src={headSrc} className={styles.avatar} onClick={() => {
-                    const easterEgg: Notification[] = [
-                        {
-                            type: "info",
-                            text: "Зачем ты сюда нажал?"
-                        },
-                        {
-                            type: "info",
-                            text: "Не нажимай сюда, ладно?"
-                        },
-                        {
-                            type: "error",
-                            text: "Остановить!",
-                        },
-                        {
-                            type: "info",
-                            text: "Это последнее уведомление, хватит нажимать!",
-                        },
-                        {
-                            type: "info",
-                            text: "Это точно последнее.",
-                        },
-                        {
-                            type: "error",
-                            text: "Последний раз прошу. Перестань!",
-                        },
-                        {
-                            type: "error",
-                            text: "Удаление папки system32...",
-                            shake: true
-                        },
-                        {
-                            type: "success",
-                            text: "Удаление прошло успешно!"
-                        },
-                        {
-                            type: "info",
-                            text: "Передача всех ваших данных ФБР...",
-                        },
-                        {
-                            type: "success",
-                            text: "К вам выехал наряд, ожидайте!"
-                        }
-                    ];
+                <div className={styles.avatar}
+                     onClick={() => {
+                         const easterEgg: Notification[] = [
+                             {
+                                 type: "info",
+                                 text: "Зачем ты сюда нажал?"
+                             },
+                             {
+                                 type: "info",
+                                 text: "Не нажимай сюда, ладно?"
+                             },
+                             {
+                                 type: "error",
+                                 text: "Остановить!",
+                             },
+                             {
+                                 type: "info",
+                                 text: "Это последнее уведомление, хватит нажимать!",
+                             },
+                             {
+                                 type: "info",
+                                 text: "Это точно последнее.",
+                             },
+                             {
+                                 type: "error",
+                                 text: "Последний раз прошу. Перестань!",
+                             },
+                             {
+                                 type: "error",
+                                 text: "Удаление папки system32...",
+                                 shake: true
+                             },
+                             {
+                                 type: "success",
+                                 text: "Удаление прошло успешно!"
+                             },
+                             {
+                                 type: "info",
+                                 text: "Передача всех ваших данных ФБР...",
+                             },
+                             {
+                                 type: "success",
+                                 text: "К вам выехал наряд, ожидайте!"
+                             }
+                         ];
 
-                    if (clickCount < easterEgg.length) addNotification(easterEgg[clickCount])
+                         if (clickCount < easterEgg.length) addNotification(easterEgg[clickCount])
 
-                    clickCount++
+                         clickCount++
 
-                    if (clickCount === easterEgg.length + 1) {
-                        clickCount = 0
-                        window.open('https://www.youtube.com/watch?v=vdmYF6App9M', '_blank');
-                    }
-                }}
-                     alt="avatar" />
+                         if (clickCount === easterEgg.length + 1) {
+                             clickCount = 0
+                             window.open('https://www.youtube.com/watch?v=vdmYF6App9M', '_blank', 'noopener noreferrer');
+                         }
+                     }}
+                >
+                    <Avatar username={selectedAccount?.username} />
+                </div>
                 <h2>{selectedAccount?.username}</h2>
             </div>
 
