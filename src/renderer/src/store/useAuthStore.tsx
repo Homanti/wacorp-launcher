@@ -2,6 +2,7 @@ import {create} from "zustand";
 import {persist} from "zustand/middleware";
 import apiClient from "../utils/api";
 import {AxiosError} from "axios";
+import {useNotificationsStore} from "./useNotificationsStore";
 
 export type AuthAccount = {
     username: string;
@@ -34,6 +35,39 @@ type RefreshResponse = {
 };
 
 let refreshPromise: Promise<AuthAccount | null> | null = null;
+
+const validateCredentials = (username: string, password: string, rp_history?: string): string | null => {
+    const pattern = /^[a-zA-Z0-9_]+$/;
+
+    if (!username || username.length < 3) {
+        return "Логин должен содержать минимум 3 символа";
+    }
+    if (username.length > 16) {
+        return "Логин не может быть длиннее 16 символов";
+    }
+    if (!pattern.test(username)) {
+        return "Логин может содержать только латинские буквы, цифры и подчеркивание";
+    }
+
+    if (!password || password.length < 8) {
+        return "Пароль должен содержать минимум 8 символов";
+    }
+    if (password.length > 32) {
+        return "Пароль не может быть длиннее 32 символов";
+    }
+    if (!pattern.test(password)) {
+        return "Пароль может содержать только латинские буквы, цифры и подчеркивание";
+    }
+
+    if (rp_history && rp_history.length < 100) {
+        return "РП история должна содержать минимум 100 символов"
+    }
+    if (rp_history && rp_history.length > 10000) {
+        return "РП история не может быть длиннее 10000 символов";
+    }
+
+    return null;
+};
 
 export const useAuthStore = create<AuthStore>()(
     persist(
@@ -134,6 +168,7 @@ export const useAuthStore = create<AuthStore>()(
                         }));
 
                         return updated;
+
                     } catch (err) {
                         const e = err as AxiosError<{ detail?: string; message?: string }>;
                         const status = e.response?.status;
@@ -149,6 +184,11 @@ export const useAuthStore = create<AuthStore>()(
 
                                 const selectedRemoved =
                                     s.selectedAccount?.refreshToken === refreshTokenKey;
+
+                                useNotificationsStore.getState().addNotification({
+                                    type: "error",
+                                    text: "Срок аутентификации истёк"
+                                });
 
                                 return {
                                     accounts: newAccounts,
@@ -175,10 +215,22 @@ export const useAuthStore = create<AuthStore>()(
                 if (me1) return { ...acc, ...me1 };
 
                 const refreshed = await get().refreshToken(acc.refreshToken);
-                if (!refreshed) return null;
+                if (!refreshed) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Ошибка аутентификации. Код: 1"
+                    });
+                    return null
+                }
 
                 const me2 = await get().validateToken(refreshed.accessToken);
-                if (!me2) return null;
+                if (!me2) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Ошибка аутентификации. Код: 2"
+                    });
+                    return null
+                }
 
                 const merged: AuthAccount = { ...acc, ...me2, ...refreshed };
 
@@ -191,18 +243,17 @@ export const useAuthStore = create<AuthStore>()(
             },
 
             login: async (username: string, password: string): Promise<boolean> => {
-                const pattern = /^[A-Za-z0-9_-]+$/;
-                const nicknameIsValid = (u: string): boolean =>
-                    pattern.test(u) && u.length >= 3 && u.length <= 16;
-                const passwordIsValid = (p: string): boolean =>
-                    pattern.test(p) && p.length >= 6 && p.length <= 32;
-
-                if (!nicknameIsValid(username) || !passwordIsValid(password)) {
+                const validationError = validateCredentials(username, password);
+                if (validationError) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: validationError
+                    });
                     return false;
                 }
 
                 try {
-                    const response = await apiClient.post('/auth/login', { username: username, password: password });
+                    const response = await apiClient.post('/auth/login', { username, password });
 
                     const account: AuthAccount = {
                         username,
@@ -214,27 +265,76 @@ export const useAuthStore = create<AuthStore>()(
                         accounts: [...state.accounts.filter(acc => acc.username !== username), account],
                         selectedAccount: account
                     }));
+
+                    useNotificationsStore.getState().addNotification({
+                        type: "success",
+                        text: "Вы успешно авторизовались!"
+                    });
+
                     return true;
-                } catch {
+
+                } catch (error) {
+                    const e = error as AxiosError<{ detail?: string }>;
+
+                    if (e.response?.status === 401) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Неверный логин или пароль"
+                        });
+                    } else if (e.response?.status === 422) {
+                        const detail = e.response.data?.detail;
+
+                        console.error(detail);
+
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Произошла ошибка во время валидации данных"
+                        });
+
+                    } else if (e.response) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Произошла ошибка во время авторизации"
+                        });
+
+                        console.error(e.response);
+                    } else {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Не удалось подключиться к серверу"
+                        });
+
+                        console.error(e.response);
+                    }
+
                     return false;
                 }
             },
 
             register: async (formData: FormData): Promise<boolean> => {
+                const username = formData.get('username') as string;
+                const password = formData.get('password') as string;
+                const rp_history = formData.get('rp_history') as string;
+
+                const validationError = validateCredentials(username, password, rp_history);
+                if (validationError) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: validationError
+                    });
+                    return false;
+                }
+
+                if (!rp_history) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "РП история должна содержать минимум 100 символов"
+                    })
+
+                    return false;
+                }
+
                 try {
-                    const pattern = /^[A-Za-z0-9_-]+$/;
-                    const nicknameIsValid = (username: string): boolean =>
-                        pattern.test(username) && username.length >= 3 && username.length <= 16;
-                    const passwordIsValid = (password: string): boolean =>
-                        pattern.test(password) && password.length >= 6 && password.length <= 32;
-
-                    const username = formData.get('username') as string;
-                    const password = formData.get('password') as string;
-
-                    if (!username || !password || !nicknameIsValid(username) || !passwordIsValid(password)) {
-                        return false;
-                    }
-
                     const response = await apiClient.post('/auth/register', formData);
 
                     const account: AuthAccount = {
@@ -248,8 +348,35 @@ export const useAuthStore = create<AuthStore>()(
                         selectedAccount: account
                     }));
                     return true;
-                } catch (e) {
-                    console.error('Register error:', e);
+                } catch (error) {
+                    const e = error as AxiosError<{ detail?: string }>;
+
+                    if (e.response?.status === 422) {
+                        const detail = e.response.data?.detail;
+
+                        console.error(detail);
+
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Произошла ошибка во время валидации данных"
+                        });
+
+                    } else if (e.response) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Произошла ошибка во время регистрации"
+                        });
+
+                        console.error(e.response);
+                    } else {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Не удалось подключиться к серверу"
+                        });
+
+                        console.error(e.response);
+                    }
+
                     return false;
                 }
             }

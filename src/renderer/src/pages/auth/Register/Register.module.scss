@@ -19,12 +19,12 @@
         margin: 0;
     }
 
-    &.noAccount {
+    &.noAccounts {
         padding: 0 3.125rem;
         width: 100%;
         max-width: 25rem;
 
-        background: var(--second-surface-color);
+        background: var(--surface-color);
     }
 }
 
@@ -74,7 +74,7 @@
     }
 }
 
-.noAccount {
+.noAccounts {
     width: 100%;
     height: 100%;
 

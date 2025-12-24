@@ -5,12 +5,13 @@ import { Home, Settings, Siren, User } from "lucide-react";
 import {useAuthStore} from "../../store/useAuthStore";
 import {useEffect, useState} from "react";
 import {extractHead} from "../../utils/extractHead";
+import {useNotificationsStore, type Notification} from "../../store/useNotificationsStore";
 
 const routes = [
     { path: "/", label: "Главная", icon: <Home />, end: true },
     { path: "/accounts", label: "Аккаунты", icon: <User />, end: true },
     { path: "/settings", label: "Настройки", icon: <Settings />, end: true },
-    { path: "/fbi/searching", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*" },
+    { path: "/fbi", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*" },
 ];
 
 const Sidebar = () => {
@@ -18,6 +19,10 @@ const Sidebar = () => {
     const fbiMatch = useMatch("/fbi/*");
     const selectedAccount = useAuthStore(s => s.selectedAccount);
     const [headSrc, setHeadSrc] = useState('');
+
+    const addNotification = useNotificationsStore(s => s.addNotification);
+
+    let clickCount = 0;
 
     useEffect(() => {
         if (selectedAccount?.username) {
@@ -31,7 +36,61 @@ const Sidebar = () => {
     return (
         <div className={styles.sidebar}>
             <div className={styles.account}>
-                <img src={headSrc} className={styles.avatar} alt="avatar" />
+                <img src={headSrc} className={styles.avatar} onClick={() => {
+                    const easterEgg: Notification[] = [
+                        {
+                            type: "info",
+                            text: "Зачем ты сюда нажал?"
+                        },
+                        {
+                            type: "info",
+                            text: "Не нажимай сюда, ладно?"
+                        },
+                        {
+                            type: "error",
+                            text: "Остановить!",
+                        },
+                        {
+                            type: "info",
+                            text: "Это последнее уведомление, хватит нажимать!",
+                        },
+                        {
+                            type: "info",
+                            text: "Это точно последнее.",
+                        },
+                        {
+                            type: "error",
+                            text: "Последний раз прошу. Перестань!",
+                        },
+                        {
+                            type: "error",
+                            text: "Удаление папки system32...",
+                            shake: true
+                        },
+                        {
+                            type: "success",
+                            text: "Удаление прошло успешно!"
+                        },
+                        {
+                            type: "info",
+                            text: "Передача всех ваших данных ФБР...",
+                        },
+                        {
+                            type: "success",
+                            text: "К вам выехал наряд, ожидайте!"
+                        }
+                    ];
+
+                    if (clickCount < easterEgg.length) addNotification(easterEgg[clickCount])
+
+                    clickCount++
+
+                    if (clickCount === easterEgg.length + 1) {
+                        clickCount = 0
+                        window.open('https://www.youtube.com/watch?v=vdmYF6App9M', '_blank');
+                    }
+                }}
+                     alt="avatar" />
                 <h2>{selectedAccount?.username}</h2>
             </div>
 

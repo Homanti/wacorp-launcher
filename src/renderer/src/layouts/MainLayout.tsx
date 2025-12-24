@@ -7,6 +7,8 @@ import ProgressBar from "../components/ProgressBar/ProgressBar";
 import useProgressBarStore from "../store/useProgressBarStore";
 import {useAuthStore} from "../store/useAuthStore";
 import {Outlet, useLocation} from "react-router-dom";
+import Notifications from "../components/Notifications/Notifications";
+import RootModal from "../components/RootModal/RootModal";
 
 type MainLayoutProps = {
     children: ReactNode;
@@ -50,6 +52,9 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
                             {children ?? <Outlet />}
                         </motion.div>
                     </AnimatePresence>
+
+                    <Notifications />
+                    <RootModal />
                 </div>
 
                 <AnimatePresence initial={false}>

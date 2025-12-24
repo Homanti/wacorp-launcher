@@ -16,6 +16,8 @@ declare global {
             minecraftLaunch: (launchOptions: launchOptions) => Promise<void>;
             openGameDir: () => Promise<void>;
 
+            getServerStatus: () => Promise<number | boolean>;
+
             reinstall: (what: "mods" | "resourcepacks") => Promise<void>;
             deleteGameDir: () => Promise<void>;
 
@@ -23,6 +25,7 @@ declare global {
 
             onProgressBar: (cb: (isVisible: boolean, description?: string, percent?: number | null) => void) => () => void;
             onLaunchButton: (cb: (disabled: boolean, text?: string) => void) => () => void;
+            onAddNotification: (cb: (type: "success" | "info" | "error", text: string) => void) => () => void;
         };
     }
 }

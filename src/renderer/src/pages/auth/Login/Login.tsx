@@ -3,11 +3,9 @@ import {Link, useLocation} from "react-router-dom";
 import Input from "../../../components/Input/Input";
 import Button from "../../../components/Button/Button";
 import {useAuthStore} from "../../../store/useAuthStore";
-import {useRef} from "react";
+import {useState} from "react";
 
 const Login = () => {
-    const loginRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
     const login = useAuthStore(s => s.login);
 
     const location = useLocation();
@@ -15,10 +13,11 @@ const Login = () => {
     const mode = (location.state)?.mode;
     const isAddAccountFlow = mode === "addAccount";
 
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const username = loginRef.current?.value || "";
-        const password = passwordRef.current?.value || "";
 
         await login(username, password);
     };
@@ -29,23 +28,24 @@ const Login = () => {
                 <h2>Вход в аккаунт WacoRP</h2>
 
                 <Input
-                    ref={loginRef}
                     className={styles.input}
                     placeholder="Введите ваш логин"
+                    type="text"
+                    onChange={(e) => setUsername(e.target.value)}
                     min={3}
                     max={16}
                 />
 
                 <Input
-                    ref={passwordRef}
                     className={styles.input}
                     placeholder="Введите ваш пароль"
                     type="password"
+                    onChange={(e) => setPassword(e.target.value)}
                     min={6}
                     max={32}
                 />
 
-                <Button className={styles.button} type="submit">Войти</Button>
+                <Button className={styles.button} type="submit" disabled={!username || !password}>Войти</Button>
 
                 <div className={styles.footer}>
                     <p>Нет аккаунта?</p>

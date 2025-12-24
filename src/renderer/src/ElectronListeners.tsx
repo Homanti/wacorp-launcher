@@ -1,6 +1,7 @@
 import {useEffect} from "react";
 import useProgressBarStore from "./store/useProgressBarStore";
 import useLaunchButton from "./store/useLaunchButton";
+import {useNotificationsStore} from "./store/useNotificationsStore";
 
 function ElectronListeners() {
     useEffect(() => {
@@ -25,9 +26,14 @@ function ElectronListeners() {
                 }
             });
 
+            const offAddNotification = window.api.onAddNotification((type, text) => {
+                useNotificationsStore.getState().addNotification({type, text});
+            });
+
             return () => {
                 offProgressBar?.();
                 offLaunchButton?.();
+                offAddNotification?.();
             };
         } catch (e) {
             console.error(e);

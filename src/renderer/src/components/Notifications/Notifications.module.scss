@@ -1,0 +1,15 @@
+.notifications {
+    display: flex;
+    position: absolute;
+
+    flex-direction: column;
+    align-items: flex-end;
+
+    top: 0;
+    right: 0;
+
+    padding: 0.625rem;
+    gap: 0.625rem;
+
+    z-index: 101;
+}

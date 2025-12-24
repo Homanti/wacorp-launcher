@@ -53,6 +53,10 @@ const createWindow = () => {
         await minecraft.reinstall(what);
     })
 
+    ipcMain.handle('launcher:getServerStatus', async () => {
+        return minecraft.getServerStatus();
+    })
+
     ipcMain.handle('launcher:deleteGameDir', async () => {
         await fs.rm(minecraft.minecraftPath, {recursive: true, force: true}).catch((e) => {console.error(e)});
     })

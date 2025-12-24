@@ -7,6 +7,7 @@ import Login from "./pages/auth/Login/Login";
 import Register from "./pages/auth/Register/Register";
 import FbiSearching from "./pages/FBI/Searching/FbiSearching";
 import FbiAdding from "./pages/FBI/Adding/FbiAdding";
+import Fbi from "./pages/FBI/Fbi";
 
 export const publicRoutes: RouteObject[] = [
     { path: '/auth/login', element: <Login /> },
@@ -17,6 +18,7 @@ export const protectedRoutes: RouteObject[] = [
     { path: '/', element: <Home /> },
     { path: '/accounts', element: <Accounts /> },
     { path: '/settings', element: <Settings /> },
+    { path: '/fbi', element: <Fbi /> },
     { path: '/fbi/searching', element: <FbiSearching /> },
     { path: '/fbi/adding', element: <FbiAdding /> },
 ];

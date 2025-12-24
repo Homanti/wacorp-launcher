@@ -1,0 +1,67 @@
+.notificationItem {
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--border-radius);
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: center;
+    align-items: center;
+
+    width: max-content;
+
+    &.success {
+        background: #2ecc71;
+        color: white;
+    }
+
+    &.info {
+        background: #3498db;
+        color: white;
+    }
+
+    &.error {
+        background: #e74c3c;
+        color: white;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3125rem;
+
+    & > p {
+        margin: 0;
+    }
+
+    max-width: 25rem;
+    text-wrap: pretty;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shakingText {
+    animation: shake 0.3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0) }
+    10% { transform: translate(-6px, 2px) }
+    20% { transform: translate(6px, -2px) }
+    30% { transform: translate(-2px, -6px) }
+    40% { transform: translate(2px, 6px) }
+    50% { transform: translate(-6px, -2px) }
+    60% { transform: translate(6px, 2px) }
+    70% { transform: translate(-2px, 6px) }
+    80% { transform: translate(2px, -6px) }
+    90% { transform: translate(-6px, 2px) }
+    100% { transform: translate(0, 0) }
+}
