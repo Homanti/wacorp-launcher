@@ -19,13 +19,33 @@ contextBridge.exposeInMainWorld('api', {
         return ramInfo;
     },
 
-    onProgressBar: (cb: (visible: boolean, description?: string, percent?: number | null) => void) => {
-        const handler = (_event: unknown, visible: boolean, description: string, percent?: number | null) => cb(visible, description, percent);
+    onProgressBar: (cb: (visible: boolean, description?: string, percent?: number) => void) => {
+        const handler = (_event: unknown, visible: boolean, description: string, percent?: number) => cb(visible, description, percent);
 
         ipcRenderer.on("launcher:useProgressBar", handler);
 
         return () => {
             ipcRenderer.removeListener("launcher:useProgressBar", handler);
+        };
+    },
+
+    onProgressBarSpeed: (cb: (speed?: number) => void) => {
+        const handler = (_event: unknown, speed?: number) => cb(speed);
+
+        ipcRenderer.on("launcher:setProgressBarSpeed", handler);
+
+        return () => {
+            ipcRenderer.removeListener("launcher:setProgressBarSpeed", handler);
+        };
+    },
+
+    onProgressBarEstimated: (cb: (estimated?: number) => void) => {
+        const handler = (_event: unknown, estimated?: number) => cb(estimated);
+
+        ipcRenderer.on("launcher:setProgressBarEstimated", handler);
+
+        return () => {
+            ipcRenderer.removeListener("launcher:setProgressBarEstimated", handler);
         };
     },
 

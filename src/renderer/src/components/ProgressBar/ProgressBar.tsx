@@ -3,9 +3,12 @@ import styles from './ProgressBar.module.scss';
 type ProgressBarProps = {
     percent: number | null;
     description?: string;
+
+    speed?: string,
+    estimated?: string,
 };
 
-function ProgressBar({ percent, description }: ProgressBarProps) {
+function ProgressBar({ percent, description, speed, estimated }: ProgressBarProps) {
     const indeterminate = percent === null;
 
     return (
@@ -14,7 +17,7 @@ function ProgressBar({ percent, description }: ProgressBarProps) {
                 className={`${styles.progress} ${indeterminate ? styles.indeterminate : ''}`}
                 style={indeterminate ? undefined : { width: `${percent}%` }}
             />
-            <span className={styles.text}>{description && !indeterminate ? `${description}: ` : description ? description + "..." : ''} {!indeterminate && `${percent}%`}</span>
+            <span className={styles.text}>{description && !indeterminate ? `${description}: ` : description ? description + "..." : ''} {!indeterminate && `${percent}%.`} {speed && speed} {estimated && estimated}</span>
         </div>
     );
 }

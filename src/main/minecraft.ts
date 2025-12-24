@@ -9,6 +9,7 @@ import {API_URL, SERVER_IP} from "../config/api.config";
 import mc from "minecraftstatuspinger";
 import MinecraftChecker from "./MinecraftChecker";
 import log from "electron-log";
+import {formatSpeed, formatTime} from "./utils/formatUtils";
 
 export type launchOptions = {
     username: string;
@@ -29,6 +30,12 @@ class Minecraft {
         this.win = win;
         this.authLibDir = path.join(this.minecraftPath, 'libraries', 'com', 'mojang', 'authlib', 'authlib-injector-1.2.7.jar');
     }
+
+    private sendToRenderer(channel: string, ...args: unknown[]) {
+        if (!this.win.isDestroyed()) {
+            this.win.webContents.send(channel, ...args);
+        }
+    }
     
     async launchMinecraft(launchOptions: launchOptions) {
         const username = launchOptions.username;
@@ -36,7 +43,7 @@ class Minecraft {
         const accessToken = launchOptions.accessToken;
 
         const opt: LaunchOPTS = {
-            timeout: 10000,
+            timeout: 30000,
             path: this.minecraftPath,
             url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
             authenticator: {
@@ -86,15 +93,20 @@ class Minecraft {
         let started = false;
         let isOptionsCreated = false;
 
-        launch.on('extract', extract => {
-            log.info(extract);
-        });
+        let lastProgressUpdate = 0;
+        let lastCheckUpdate = 0;
 
         launch.on('progress', async (progress, size, element) => {
-            const percent = Number(((progress / size) * 100).toFixed(2));
+            const now = Date.now();
 
-            this.win.webContents.send("launcher:useProgressBar", true, `Установка игры: ${element}`, percent)
-            this.win.webContents.send("launcher:useLaunchButton", true, "Установка...");
+            if (now - lastProgressUpdate >= 100) {
+                lastProgressUpdate = now;
+
+                const percent = Number(((progress / size) * 100).toFixed(2));
+
+                this.sendToRenderer("launcher:useProgressBar", true, `Установка игры: ${element}`, percent)
+                this.sendToRenderer("launcher:useLaunchButton", true, "Установка...");
+            }
 
             if (!isOptionsCreated) {
                 isOptionsCreated = true;
@@ -105,27 +117,56 @@ class Minecraft {
             }
         });
 
-        launch.on('check', (progress, size, element) => {
-            const percent = Number(((progress / size) * 100).toFixed(2));
+        launch.on('speed', (speed) => {
+            const formattedSpeed = formatSpeed(speed);
+            this.sendToRenderer("launcher:setProgressBarSpeed", `Скорость: ${formattedSpeed}.`);
+        })
 
-            this.win.webContents.send("launcher:useProgressBar", true, `Проверка файлов. ${element}`, percent)
-            this.win.webContents.send("launcher:useLaunchButton", true, "Проверка файлов...");
+        launch.on('estimated', (estimated) => {
+            const formattedTime = formatTime(estimated);
+            this.sendToRenderer("launcher:setProgressBarEstimated", `Осталось примерно ${formattedTime}.`);
+        })
+
+        launch.on('check', (progress, size, element) => {
+            const now = Date.now();
+
+            if (now - lastCheckUpdate >= 100) {
+                lastCheckUpdate = now;
+
+                const percent = Number(((progress / size) * 100).toFixed(2));
+
+                this.sendToRenderer("launcher:useProgressBar", true, `Проверка файлов. ${element}`, percent)
+
+                this.sendToRenderer("launcher:setProgressBarSpeed", null);
+                this.sendToRenderer("launcher:setProgressBarEstimated", null);
+
+                this.sendToRenderer("launcher:useLaunchButton", true, "Проверка файлов...");
+            }
+        });
+
+        launch.on('extract', extract => {
+            log.info(extract);
+            this.sendToRenderer("launcher:useProgressBar", true, `Распаковка файлов...`, null)
+            this.sendToRenderer("launcher:useLaunchButton", true, "Распаковка файлов...");
         });
 
         launch.on('patch', patch => {
             log.info(patch);
 
-            this.win.webContents.send("launcher:useProgressBar", true, `Проверка файлов`, null)
-            this.win.webContents.send("launcher:useLaunchButton", true, "Проверка файлов...");
+            this.sendToRenderer("launcher:setProgressBarSpeed", null);
+            this.sendToRenderer("launcher:setProgressBarEstimated", null);
+
+            this.sendToRenderer("launcher:useProgressBar", true, `Установка Forge`, null)
+            this.sendToRenderer("launcher:useLaunchButton", true, "Установка Forge...");
         });
 
         launch.on('data', (e) => {
             if (!started) {
                 started = true;
 
-                this.win.webContents.send("launcher:useProgressBar", false);
-                this.win.webContents.send("launcher:useLaunchButton", true, "Запущен");
-                this.win.webContents.send("launcher:addNotification", "success", "Майнкрафт запущен");
+                this.sendToRenderer("launcher:useProgressBar", false);
+                this.sendToRenderer("launcher:useLaunchButton", true, "Запущен");
+                this.sendToRenderer("launcher:addNotification", "success", "Майнкрафт запущен");
             }
             log.info(e);
         })
@@ -134,14 +175,14 @@ class Minecraft {
             log.info(code);
             started = false;
 
-            this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
+            this.sendToRenderer("launcher:useLaunchButton", false, "Играть");
         });
 
         launch.on('error', err => {
             log.error(err);
 
-            this.win.webContents.send("launcher:useLaunchButton", false, "Играть");
-            this.win.webContents.send("launcher:addNotification", "error", "Неизвестная ошибка");
+            this.sendToRenderer("launcher:useLaunchButton", false, "Играть");
+            this.sendToRenderer("launcher:addNotification", "error", "Неизвестная ошибка");
         });
 
         const checker = new MinecraftChecker(this.win, this.minecraftPath);
@@ -150,7 +191,7 @@ class Minecraft {
         await checker.checkResourcePacks();
         await checker.checkPointBlank();
 
-        this.win.webContents.send("launcher:useLaunchButton", true, "Запуск...");
+        this.sendToRenderer("launcher:useLaunchButton", true, "Запуск...");
 
         log.info('Launching minecraft...');
         await launch.Launch(opt);

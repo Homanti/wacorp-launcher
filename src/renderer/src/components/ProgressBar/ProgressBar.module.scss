@@ -19,6 +19,8 @@
 
     background: var(--accent-color);
     z-index: -1;
+
+    transition: width 0.2s ease-in-out;
 }
 
 .text {

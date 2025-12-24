@@ -5,6 +5,7 @@ import { Home, Settings, Siren, User } from "lucide-react";
 import {useAuthStore} from "../../store/useAuthStore";
 import {useNotificationsStore, type Notification} from "../../store/useNotificationsStore";
 import Avatar from "../Avatar/Avatar";
+import {useState} from "react";
 
 const routes = [
     { path: "/", label: "Главная", icon: <Home />, end: true },
@@ -20,7 +21,7 @@ const Sidebar = () => {
 
     const addNotification = useNotificationsStore(s => s.addNotification);
 
-    let clickCount = 0;
+    const [clickCount, setClickCount] = useState(0);
 
     return (
         <div className={styles.sidebar}>
@@ -73,10 +74,10 @@ const Sidebar = () => {
 
                          if (clickCount < easterEgg.length) addNotification(easterEgg[clickCount])
 
-                         clickCount++
+                         setClickCount(clickCount + 1);
 
                          if (clickCount === easterEgg.length + 1) {
-                             clickCount = 0
+                             setClickCount(0);
                              window.open('https://www.youtube.com/watch?v=vdmYF6App9M', '_blank', 'noopener noreferrer');
                          }
                      }}

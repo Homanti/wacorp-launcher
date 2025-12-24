@@ -9,6 +9,12 @@ type progressBarStore = {
 
     isVisible: boolean,
     setIsVisible: (isVisible: boolean) => void,
+
+    speed?: string,
+    setSpeed: (speed: string) => void,
+
+    estimated?: string,
+    setEstimated: (estimated: string) => void,
 }
 
 export const useProgressBarStore = create<progressBarStore>((set) => ({
@@ -19,7 +25,13 @@ export const useProgressBarStore = create<progressBarStore>((set) => ({
     setDescription: (description: string) => set({description}),
 
     isVisible: false,
-    setIsVisible: (isVisible: boolean) => set({isVisible})
+    setIsVisible: (isVisible: boolean) => set({isVisible}),
+
+    speed: "",
+    setSpeed: (speed: string) => set({speed}),
+
+    estimated: "",
+    setEstimated: (estimated: string) => set({estimated}),
 }));
 
 export default useProgressBarStore;

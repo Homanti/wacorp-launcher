@@ -18,6 +18,10 @@ type MainLayoutProps = {
 const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
     const progressBarisVisible = useProgressBarStore(state => state.isVisible)
     const percent = useProgressBarStore(state => state.percent)
+
+    const estimated = useProgressBarStore(state => state.estimated)
+    const speed = useProgressBarStore(state => state.speed)
+
     const description = useProgressBarStore(state => state.description)
     const accounts = useAuthStore(state => state.accounts);
     const routerLocation = useLocation();
@@ -65,7 +69,7 @@ const MainLayout = ({children, isSidebar = true}: MainLayoutProps) => {
                             animate={{height: "auto"}}
                             exit={{height: 0}}
                         >
-                            <ProgressBar percent={percent} description={description}/>
+                            <ProgressBar percent={percent} description={description} speed={speed} estimated={estimated} />
                         </motion.div>
                     }
                 </AnimatePresence>

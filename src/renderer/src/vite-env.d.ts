@@ -23,7 +23,10 @@ declare global {
 
             getTotalRam: () => Promise<number>;
 
-            onProgressBar: (cb: (isVisible: boolean, description?: string, percent?: number | null) => void) => () => void;
+            onProgressBar: (cb: (isVisible: boolean, description?: string, percent?: number) => void) => () => void;
+            onProgressBarSpeed: (cb: (speed?: string) => void) => () => void;
+            onProgressBarEstimated: (cb: (estimated?: string) => void) => () => void;
+
             onLaunchButton: (cb: (disabled: boolean, text?: string) => void) => () => void;
             onAddNotification: (cb: (type: "success" | "info" | "error", text: string) => void) => () => void;
         };

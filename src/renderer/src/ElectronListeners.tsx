@@ -16,6 +16,18 @@ function ElectronListeners() {
                 }
             });
 
+            const offProgressBarSpeed = window.api.onProgressBarSpeed((speed) => {
+                useProgressBarStore.setState(
+                    state => ({...state, speed: speed})
+                );
+            });
+
+            const offProgressBarEstimated = window.api.onProgressBarEstimated((estimated) => {
+                useProgressBarStore.setState(
+                    state => ({...state, estimated: estimated})
+                );
+            });
+
             const offLaunchButton = window.api.onLaunchButton((disabled, text) => {
                 if (text) {
                     useLaunchButton.setState(
@@ -34,6 +46,8 @@ function ElectronListeners() {
                 offProgressBar?.();
                 offLaunchButton?.();
                 offAddNotification?.();
+                offProgressBarSpeed?.();
+                offProgressBarEstimated?.();
             };
         } catch (e) {
             console.error(e);
