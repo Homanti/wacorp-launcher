@@ -9,10 +9,18 @@ function Avatar({username}: {username: string | undefined}) {
     useEffect(() => {
         if (!username) return setAvatar(placeholder);
 
-        const skinUrl = `https://raw.githubusercontent.com/Homanti/wacorp-skins/main/${username}.png`;
-        extractHead(skinUrl)
-            .then((dataUrl: string) => setAvatar(dataUrl))
-            .catch(console.error);
+        (async () => {
+            try {
+                const skinURL = `https://raw.githubusercontent.com/Homanti/wacorp-skins/refs/heads/main/skins/${username}.png`
+                const dataUrl = await extractHead(skinURL);
+
+                setAvatar(dataUrl);
+
+            } catch (error) {
+                console.error(error);
+                setAvatar(placeholder);
+            }
+        })();
     }, [username]);
 
     return (

@@ -1,0 +1,45 @@
+.skinPickerLabel {
+    width: 100%;
+}
+
+.dropzone {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3125rem;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 1rem;
+
+    border: 0.125rem dashed var(--control-bg);
+    border-radius: var(--border-radius);
+
+    cursor: pointer;
+
+    & p {
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .selectedSkin {
+        font-size: 0.875rem;
+        color: var(--secondary-color);
+    }
+
+    .icon {
+        color: var(--secondary-color);
+        width: 3.125rem;
+        height: auto;
+    }
+}
+
+.dragging {
+    border: 0.125rem dashed #007aff;
+}

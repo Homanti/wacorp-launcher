@@ -3,13 +3,21 @@ import {persist} from "zustand/middleware";
 import apiClient from "../utils/api";
 import {AxiosError} from "axios";
 import {useNotificationsStore} from "./useNotificationsStore";
+import {type NavigateFunction} from "react-router-dom";
+import {validateSkinImage} from "../utils/validateSkin";
+import PAGES from "../../../config/pages.config";
 
 export type AuthAccount = {
+    id: number;
     username: string;
     accessToken: string;
     refreshToken: string;
+
     minecraftAccessToken?: string;
     uuid?: string;
+
+    discordId?: string;
+    accepted?: boolean;
 };
 
 type AuthStore = {
@@ -22,16 +30,21 @@ type AuthStore = {
 
     setSelectedAccount: (username: string) => void;
 
-    login: (username: string, password: string) => Promise<boolean>;
-    register: (formData: FormData) => Promise<boolean>;
+    login: (username: string, password: string, navigate?: NavigateFunction) => Promise<boolean>;
+    register: (formData: FormData, navigate?: NavigateFunction) => Promise<boolean>;
     validateToken: (accessToken: string) => Promise<AuthAccount | null>;
     refreshToken: (refreshToken: string) => Promise<AuthAccount | null>;
     validateAndRefresh: (accessToken: string, refreshToken: string) => Promise<AuthAccount | null>;
+
+    logout: (username: string) => void;
 };
 
 type RefreshResponse = {
+    user_id: number;
     access_token: string;
     refresh_token: string;
+    user_discord_id?: string;
+    user_accepted?: boolean;
 };
 
 let refreshPromise: Promise<AuthAccount | null> | null = null;
@@ -106,12 +119,24 @@ export const useAuthStore = create<AuthStore>()(
                     )
                 })),
 
-            setSelectedAccount: (username: string) => {
-                set((state) => ({
-                    selectedAccount: state.accounts.find(
-                        (acc) => acc.username === username
-                    ) || null
-                }));
+            setSelectedAccount: async (username: string) => {
+                const state = get();
+                const account = state.accounts.find((acc) => acc.username === username);
+
+                if (!account) {
+                    set({ selectedAccount: null });
+                    return;
+                }
+
+                set({ selectedAccount: account });
+
+                const validated = await get().validateAndRefresh(account.accessToken, account.refreshToken);
+
+                if (validated) {
+                    set({ selectedAccount: validated });
+                } else {
+                    set({ selectedAccount: state.accounts.at(-1) ?? null });
+                }
             },
 
             validateToken: async (accessToken: string): Promise<AuthAccount | null> => {
@@ -126,9 +151,13 @@ export const useAuthStore = create<AuthStore>()(
 
                     return {
                         ...current,
+                        id: response.data.id ?? current.id,
                         username: response.data.username ?? current.username,
                         uuid: response.data.uuid ?? current.uuid,
-                        minecraftAccessToken: response.data.minecraft_access_token
+                        minecraftAccessToken: response.data.minecraft_access_token,
+
+                        discordId: response.data.discord_id,
+                        accepted: response.data.accepted
                     };
                 } catch {
                     return null;
@@ -153,8 +182,12 @@ export const useAuthStore = create<AuthStore>()(
 
                         const updated: AuthAccount = {
                             ...current,
+                            id: response.data.user_id ?? current.id,
                             accessToken: response.data.access_token,
                             refreshToken: response.data.refresh_token,
+
+                            discordId: response.data.user_discord_id,
+                            accepted: response.data.user_accepted,
                         };
 
                         set((s) => ({
@@ -212,25 +245,22 @@ export const useAuthStore = create<AuthStore>()(
                 if (!acc?.accessToken || !acc?.refreshToken) return null;
 
                 const me1 = await get().validateToken(acc.accessToken);
-                if (me1) return { ...acc, ...me1 };
+                if (me1) {
+                    const merged: AuthAccount = { ...acc, ...me1 };
+
+                    set((state) => ({
+                        accounts: state.accounts.map((a) => a.username === merged.username ? merged : a),
+                        selectedAccount: me1,
+                    }));
+
+                    return merged;
+                }
 
                 const refreshed = await get().refreshToken(acc.refreshToken);
-                if (!refreshed) {
-                    useNotificationsStore.getState().addNotification({
-                        type: "error",
-                        text: "Ошибка аутентификации. Код: 1"
-                    });
-                    return null
-                }
+                if (!refreshed) return null
 
                 const me2 = await get().validateToken(refreshed.accessToken);
-                if (!me2) {
-                    useNotificationsStore.getState().addNotification({
-                        type: "error",
-                        text: "Ошибка аутентификации. Код: 2"
-                    });
-                    return null
-                }
+                if (!me2) return null
 
                 const merged: AuthAccount = { ...acc, ...me2, ...refreshed };
 
@@ -242,7 +272,7 @@ export const useAuthStore = create<AuthStore>()(
                 return merged;
             },
 
-            login: async (username: string, password: string): Promise<boolean> => {
+            login: async (username: string, password: string, navigate?: NavigateFunction): Promise<boolean> => {
                 const validationError = validateCredentials(username, password);
                 if (validationError) {
                     useNotificationsStore.getState().addNotification({
@@ -256,9 +286,13 @@ export const useAuthStore = create<AuthStore>()(
                     const response = await apiClient.post('/auth/login', { username, password });
 
                     const account: AuthAccount = {
-                        username,
+                        id: response.data.user_id,
+                        username: username,
                         accessToken: response.data.access_token,
                         refreshToken: response.data.refresh_token,
+
+                        discordId: response.data.user_discord_id,
+                        accepted: response.data.user_accepted
                     };
 
                     set((state) => ({
@@ -270,6 +304,8 @@ export const useAuthStore = create<AuthStore>()(
                         type: "success",
                         text: "Вы успешно авторизовались!"
                     });
+
+                    if (navigate) navigate(PAGES.HOME, { replace: true });
 
                     return true;
 
@@ -311,10 +347,11 @@ export const useAuthStore = create<AuthStore>()(
                 }
             },
 
-            register: async (formData: FormData): Promise<boolean> => {
+            register: async (formData: FormData, navigate?: NavigateFunction): Promise<boolean> => {
                 const username = formData.get('username') as string;
                 const password = formData.get('password') as string;
                 const rp_history = formData.get('rp_history') as string;
+                const skinFile = formData.get('skin_file') as File;
 
                 const validationError = validateCredentials(username, password, rp_history);
                 if (validationError) {
@@ -334,19 +371,73 @@ export const useAuthStore = create<AuthStore>()(
                     return false;
                 }
 
+                if (!skinFile) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Необходимо загрузить скин"
+                    });
+                    return false;
+                }
+
+                if (!skinFile.name.toLowerCase().endsWith('.png')) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Скин должен быть в формате PNG"
+                    });
+                    return false;
+                }
+
+                if (skinFile.size > 1024 * 1024) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Файл скина слишком большой (макс 1 MB)"
+                    });
+                    return false;
+                }
+
+                try {
+                    const validation = await validateSkinImage(skinFile);
+                    if (!validation.valid) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: validation.error || "Неверный формат скина"
+                        });
+                        return false;
+                    }
+                } catch (error) {
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Ошибка при проверке скина"
+                    });
+                    console.error(error);
+                    return false;
+                }
+
                 try {
                     const response = await apiClient.post('/auth/register', formData);
 
                     const account: AuthAccount = {
+                        id: response.data.user_id,
                         username: username,
                         accessToken: response.data.access_token,
                         refreshToken: response.data.refresh_token,
+
+                        discordId: response.data.user_discord_id,
+                        accepted: response.data.user_accepted,
                     };
 
                     set((state) => ({
                         accounts: [...state.accounts.filter(acc => acc.username !== username), account],
                         selectedAccount: account
                     }));
+
+                    useNotificationsStore.getState().addNotification({
+                        type: "success",
+                        text: "Вы успешно зарегистрировались!"
+                    });
+
+                    if (navigate) navigate(PAGES.LINK_DISCORD, { replace: true });
+
                     return true;
                 } catch (error) {
                     const e = error as AxiosError<{ detail?: string }>;
@@ -361,6 +452,19 @@ export const useAuthStore = create<AuthStore>()(
                             text: "Произошла ошибка во время валидации данных"
                         });
 
+                    } else if (e.response?.status === 409) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Аккаунт с таким именем уже существует."
+                        })
+
+                    } else if (e.response?.status === 400) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "error",
+                            text: "Ошибка валидации скина."
+                        })
+
+                        console.error(e.response);
                     } else if (e.response) {
                         useNotificationsStore.getState().addNotification({
                             type: "error",
@@ -373,11 +477,33 @@ export const useAuthStore = create<AuthStore>()(
                             type: "error",
                             text: "Не удалось подключиться к серверу"
                         });
-
-                        console.error(e.response);
                     }
 
                     return false;
+                }
+            },
+
+            logout: async (username: string) => {
+                const account = get().accounts.find(acc => acc.username === username);
+
+                if (!account) {
+                    console.warn('Account not found for logout');
+                    return;
+                }
+
+                try {
+                    await apiClient.post('/auth/logout', {}, {
+                        headers: { Authorization: `Bearer ${account.accessToken}` }
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                } finally {
+                    get().removeAccount(username);
+
+                    useNotificationsStore.getState().addNotification({
+                        type: "success",
+                        text: "Вы вышли из аккаунта"
+                    });
                 }
             }
         }),

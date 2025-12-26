@@ -4,6 +4,8 @@ import {Link} from "react-router-dom";
 import AccountItem from "./AccountItem/AccountItem";
 import {useAuthStore} from "../../store/useAuthStore";
 import {AnimatePresence} from "motion/react";
+import PAGES from "../../../../config/pages.config";
+import {UserPlus} from "lucide-react";
 
 const Accounts = () => {
     const accounts = useAuthStore(s => s.accounts);
@@ -13,8 +15,8 @@ const Accounts = () => {
             <section className={styles.accounts__content}>
                 <header className={styles.accounts__header}>
                     <h1>Аккаунты</h1>
-                    <Link to="/auth/login" state={{ mode: "addAccount" }}>
-                        <Button>Добавить аккаунт</Button>
+                    <Link to={PAGES.AUTH}>
+                        <Button><UserPlus /> Добавить аккаунт</Button>
                     </Link>
                 </header>
 

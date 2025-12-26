@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useMatch } from "react-router-dom";
+import {NavLink, useLocation, useMatch} from "react-router-dom";
 import styles from "./Sidebar.module.scss";
 import { motion } from "motion/react";
 import { Home, Settings, Siren, User } from "lucide-react";
@@ -6,11 +6,12 @@ import {useAuthStore} from "../../store/useAuthStore";
 import {useNotificationsStore, type Notification} from "../../store/useNotificationsStore";
 import Avatar from "../Avatar/Avatar";
 import {useState} from "react";
+import PAGES from "../../../../config/pages.config";
 
 const routes = [
-    { path: "/", label: "Главная", icon: <Home />, end: true },
-    { path: "/accounts", label: "Аккаунты", icon: <User />, end: true },
-    { path: "/settings", label: "Настройки", icon: <Settings />, end: true },
+    { path: PAGES.HOME, label: "Главная", icon: <Home />, end: true },
+    { path: PAGES.ACCOUNTS, label: "Аккаунты", icon: <User />, end: true },
+    { path: PAGES.SETTINGS, label: "Настройки", icon: <Settings />, end: true },
     { path: "/fbi", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*" },
 ];
 
@@ -76,7 +77,7 @@ const Sidebar = () => {
 
                          setClickCount(clickCount + 1);
 
-                         if (clickCount === easterEgg.length + 1) {
+                         if (clickCount === easterEgg.length) {
                              setClickCount(0);
                              window.open('https://www.youtube.com/watch?v=vdmYF6App9M', '_blank', 'noopener noreferrer');
                          }
@@ -85,6 +86,15 @@ const Sidebar = () => {
                     <Avatar username={selectedAccount?.username} />
                 </div>
                 <h2>{selectedAccount?.username}</h2>
+
+                {(!selectedAccount?.discordId || !selectedAccount?.accepted) && (
+                    <p className={styles.accountStatus}>
+                        {!selectedAccount?.discordId
+                            ? <NavLink to={PAGES.LINK_DISCORD}>Discord аккаунт не привязан</NavLink>
+                            : "Ожидает одобрения модератора"
+                        }
+                    </p>
+                )}
             </div>
 
             <nav className={styles.nav}>

@@ -95,6 +95,7 @@ const createWindow = () => {
             }
         }
     })
+
     ipcMain.handle('launcher:getServerStatus', async () => {
         return minecraft.getServerStatus();
     })

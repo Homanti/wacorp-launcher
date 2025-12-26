@@ -1,0 +1,35 @@
+.auth {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    &.noAccounts {
+        background: var(--surface-color);
+    }
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+.noAccounts {
+    width: 100%;
+    height: 100%;
+
+    background: url("../../assets/background2.png") no-repeat center center;
+    background-size: cover;
+}

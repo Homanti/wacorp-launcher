@@ -1,0 +1,82 @@
+import {useNavigate} from "react-router-dom";
+import styles from "./AuthForm.module.scss";
+import Input from "../../../components/Input/Input";
+import Textarea from "../../../components/Textarea/Textarea";
+import Button from "../../../components/Button/Button";
+import {SkinPicker} from "./SkinPicker/SkinPicker";
+import {useState} from "react";
+import {useAuthStore} from "../../../store/useAuthStore";
+import { motion } from "motion/react";
+
+type RegisterFormProps = {
+    setFormType: (formType: 'login' | 'register') => void;
+};
+
+const RegisterForm = ({setFormType}: RegisterFormProps) => {
+    const register = useAuthStore(s => s.register);
+
+    const [isChecked, setIsChecked] = useState(true);
+
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [rpHistory, setRpHistory] = useState<string>("");
+    const [skinFile, setSkinFile] = useState<File>();
+
+    const navigate = useNavigate();
+
+    const [disabled, setDisabled] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+        formData.append('rp_history', rpHistory);
+        if (skinFile) {
+            formData.append('skin_file', skinFile);
+        }
+
+        setDisabled(true);
+
+        try {
+            await register(formData, navigate);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setDisabled(false);
+        }
+    };
+
+    return (
+        <motion.form className={`${styles.form}`} onSubmit={handleSubmit}
+                     initial={{ scale: 0.5, x: 300, opacity: 0 }}
+                     animate={{ scale: 1, x: 0, opacity: 1 }}
+                     exit={{ scale: 0.5, x: 300, opacity: 0 }}
+                     transition={{ duration: 0.15 }}
+                     layout
+        >
+            <h2>Регистрация аккаунта WacoRP</h2>
+            <Input onChange={(e) => setUsername(e.target.value)} className={styles.input} type="text" placeholder="Введите ваш логин" minLength={3} maxLength={16}/>
+            <Input onChange={(e) => setPassword(e.target.value)} className={styles.input} type="password" placeholder="Введите ваш пароль" minLength={8} maxLength={32}/>
+            <Textarea onChange={(e) => setRpHistory(e.target.value)} className={styles.textarea} placeholder="РП история вашего персонажа" minLength={100} maxLength={10000} />
+            <SkinPicker skin={skinFile} setSkin={setSkinFile} />
+
+            <div className={styles.checkbox}>
+                <input type="checkbox" className={styles.checkbox} id="agree" onChange={(e) => setIsChecked(e.target.checked)} />
+                <label htmlFor="agree" className={styles.checkboxLabel}>
+                    Я ознакомился(-ась) и согласен(-а) с <a href="https://discord.gg/huezMnX5JM" target="_blank" rel="noopener noreferrer">правилами WacoRP</a>
+                </label>
+            </div>
+
+            <Button className={styles.button} type={"submit"} disabled={!isChecked || !username || !password || !rpHistory || !skinFile || disabled}>Зарегистрироваться</Button>
+
+            <div className={styles.footer}>
+                <p>Уже есть аккаунт?</p>
+                <span onClick={() => setFormType("login")}>Войти</span>
+            </div>
+        </motion.form>
+    );
+}
+
+export default RegisterForm;

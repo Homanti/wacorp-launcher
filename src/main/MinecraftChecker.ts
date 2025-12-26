@@ -13,17 +13,17 @@ type AssetFile = {
 
 class MinecraftChecker {
     private win: Electron.BrowserWindow;
-    private minecraftPath: string;
+    minecraftPath: string;
+    assetsManifestUrl: string;
 
-    constructor(win: BrowserWindow, minecraftPath = path.join(app.getPath('appData'), '.wacorp')) {
+    constructor(win: BrowserWindow, minecraftPath = path.join(app.getPath('appData'), '.wacorp'), assetsManifestUrl = 'https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json') {
         this.win = win;
         this.minecraftPath = minecraftPath;
+        this.assetsManifestUrl = assetsManifestUrl;
     }
 
     async checkMods() {
-        const actualAssetsArray = await fetch(
-            'https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json'
-        ).then(res => res.json()) as AssetFile[];
+        const actualAssetsArray = await fetch(this.assetsManifestUrl).then(res => res.json()) as AssetFile[];
 
         const actualModsArray = actualAssetsArray.filter(obj => obj.path.startsWith('mods/'));
 
@@ -60,9 +60,7 @@ class MinecraftChecker {
     }
 
     async checkResourcePacks() {
-        const actualAssetsArray = await fetch(
-            'https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json'
-        ).then(res => res.json()) as AssetFile[];
+        const actualAssetsArray = await fetch(this.assetsManifestUrl).then(res => res.json()) as AssetFile[];
 
         const actualResourcePacksArray = actualAssetsArray.filter(obj => obj.path.startsWith('resourcepacks/'));
 
@@ -99,9 +97,7 @@ class MinecraftChecker {
     }
 
     async checkPointBlank() {
-        const actualAssetsArray = await fetch(
-            'https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json'
-        ).then(res => res.json()) as AssetFile[];
+        const actualAssetsArray = await fetch(this.assetsManifestUrl).then(res => res.json()) as AssetFile[];
 
         const actualPointBlankArray = actualAssetsArray.filter(obj => obj.path.startsWith('pointblank/'));
 

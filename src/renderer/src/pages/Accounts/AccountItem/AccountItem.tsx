@@ -1,54 +1,37 @@
 import Button from "../../../components/Button/Button";
 import styles from "./AccountItem.module.scss";
-import {Pencil, Play, Trash} from "lucide-react";
+import {LogOut, Pencil, Play} from "lucide-react";
 import {useAuthStore} from "../../../store/useAuthStore";
 import { motion } from "motion/react";
 import Avatar from "../../../components/Avatar/Avatar";
 
 function AccountItem({children}: {children: string}) {
-    const removeAccount = useAuthStore(s => s.removeAccount);
+    const logout = useAuthStore(s => s.logout);
     const setSelectedAccount = useAuthStore(s => s.setSelectedAccount);
 
-    const accounts = useAuthStore(s => s.accounts);
-
-    const handleSelect = () => {
-        setSelectedAccount(children);
-
-        setTimeout(async () => {
-            const { validateAndRefresh } = useAuthStore.getState();
-            const account = accounts.find(acc => acc.username === children);
-            if (account) {
-                const validated = await validateAndRefresh(
-                    account.accessToken,
-                    account.refreshToken
-                );
-                if (!validated) {
-                    console.log('Session expired for', children);
-                }
-            }
-        });
-    };
-
     return (
-        <motion.li className={styles.item}
-                   initial={{ opacity: 0, x: "-110%" }}
-                   animate={{ opacity: 1, x: 0 }}
-                   exit={{ opacity: 0, x: "110%" }}
-                   layout
+        <motion.div
+            layout
         >
-            <div className={styles.content}>
-                <div className={styles.avatar}>
-                    <Avatar username={children} />
+            <motion.li className={styles.item}
+                       initial={{ opacity: 0, x: "-110%" }}
+                       animate={{ opacity: 1, x: 0 }}
+                       exit={{ opacity: 0, x: "110%" }}
+            >
+                <div className={styles.content}>
+                    <div className={styles.avatar}>
+                        <Avatar username={children} />
+                    </div>
+                    <h2>{children}</h2>
                 </div>
-                <h2>{children}</h2>
-            </div>
 
-            <div className={styles.actions}>
-                <Button className={styles.button} onClick={handleSelect}><Play /></Button>
-                <Button className={styles.button}><Pencil /></Button>
-                <Button className={`${styles.button} ${styles.dangerButton}`} onClick={() => removeAccount(children)}><Trash /></Button>
-            </div>
-        </motion.li>
+                <div className={styles.actions}>
+                    <Button className={styles.button} onClick={() => setSelectedAccount(children)}><Play /></Button>
+                    <Button className={styles.button}><Pencil /></Button>
+                    <Button className={`${styles.button} ${styles.dangerButton}`} onClick={() => logout(children)}><LogOut /></Button>
+                </div>
+            </motion.li>
+        </motion.div>
     );
 }
 

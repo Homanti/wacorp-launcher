@@ -3,15 +3,15 @@ import Home from "./pages/Home/Home.tsx";
 import Settings from "./pages/Settings/Settings.tsx";
 import Accounts from "./pages/Accounts/Accounts.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
-import Login from "./pages/auth/Login/Login";
-import Register from "./pages/auth/Register/Register";
 import FbiSearching from "./pages/FBI/Searching/FbiSearching";
 import FbiAdding from "./pages/FBI/Adding/FbiAdding";
 import Fbi from "./pages/FBI/Fbi";
+import Auth from "./pages/Auth/Auth";
+import DiscordLink from "./pages/DiscordLink/DiscordLink";
 
 export const publicRoutes: RouteObject[] = [
-    { path: '/auth/login', element: <Login /> },
-    { path: '/auth/register', element: <Register /> },
+    { path: '/auth', element: <Auth /> },
+    { path: '/auth/link-discord', element: <DiscordLink /> },
 ];
 
 export const protectedRoutes: RouteObject[] = [

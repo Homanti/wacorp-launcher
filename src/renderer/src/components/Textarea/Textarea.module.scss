@@ -1,3 +1,8 @@
+.textareaWrapper {
+    position: relative;
+    width: 100%;
+}
+
 .textarea {
     padding: 0.5rem;
     border: none;
@@ -35,4 +40,13 @@
     &:active {
         opacity: 0.5;
     }
+}
+
+.charCounter {
+    position: absolute;
+    bottom: 0.125rem;
+    right: 0.3125rem;
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    pointer-events: none;
 }

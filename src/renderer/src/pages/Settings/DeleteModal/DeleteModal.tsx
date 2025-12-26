@@ -1,6 +1,7 @@
 import Button from "../../../components/Button/Button";
 import styles from "./DeleteModal.module.scss"
 import {useModalStore} from "../../../store/useModalStore";
+import {Trash2} from "lucide-react";
 
 const array = {
     minecraft: "Minecraft",
@@ -20,7 +21,7 @@ function DeleteModal({what}: {what: "minecraft" | "mods" | "resourcepacks" }) {
                 <Button className={styles.dangerButton} onClick={() => {
                     closeModal();
                     window.api.delete(what);
-                }}>Удалить</Button>
+                }}><Trash2 /> Удалить</Button>
             </div>
         </div>
     );

@@ -3,9 +3,10 @@ export {};
 
 type launchOptions = {
     username: string;
-    accessToken: string;
+    accessToken?: string;
     uuid: string;
     dedicatedRam: number;
+    hideLauncher: boolean;
 }
 
 declare global {

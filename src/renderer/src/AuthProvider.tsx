@@ -1,6 +1,7 @@
 import {useAuthStore} from "./store/useAuthStore";
 import {type ReactNode, useEffect} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import PAGES from "../../config/pages.config";
 
 function AuthProvider({ children }: { children: ReactNode }) {
     const accounts = useAuthStore((s) => s.accounts);
@@ -24,15 +25,11 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }, [currentAccount?.username]);
 
     useEffect(() => {
-        const onAuthPage = location.pathname.startsWith("/auth/");
+        const onAuthPage = location.pathname.startsWith("/Auth/");
 
         if (accounts.length === 0 && !onAuthPage) {
-            navigate("/auth/login", { replace: true });
+            navigate(PAGES.AUTH, { replace: true });
             return;
-        }
-        
-        if (accounts.length > 0 && location.pathname.startsWith("/auth/") && !isAddAccountFlow) {
-            navigate("/", { replace: true });
         }
         
     }, [accounts.length, location.pathname, isAddAccountFlow, navigate]);

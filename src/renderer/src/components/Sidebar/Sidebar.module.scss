@@ -10,6 +10,9 @@
     padding: 0.9375rem;
 
     border-radius: 0 var(--border-radius) 0 0;
+
+    width: 15.625rem;
+    transition: width 0.3s ease;
 }
 
 .account {
@@ -86,4 +89,23 @@
 
     border-radius: var(--border-radius);
     background: var(--control-bg);
+}
+
+.accountStatus {
+    font-size: 0.8125rem;
+    min-width: max-content;
+    color: var(--secondary-color);
+    margin: 0;
+
+    & a {
+        text-decoration: none;
+
+        &:visited {
+            color: inherit;
+        }
+
+        &:active {
+            color: inherit;
+        }
+    }
 }

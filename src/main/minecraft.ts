@@ -13,15 +13,17 @@ import {formatSpeed, formatTime} from "./utils/formatUtils";
 
 export type launchOptions = {
     username: string;
-    accessToken: string;
+    accessToken?: string;
     uuid: string;
     dedicatedRam: number;
+    hideLauncher: boolean;
 }
 
 class Minecraft {
     version: {mc: string, forge: string};
     minecraftPath: string;
     authLibDir: string;
+    isMinecraftLaunched: boolean;
     private win: BrowserWindow;
 
     constructor(win: BrowserWindow,version = {mc: "1.20.1", forge: "47.4.13"}, minecraftPath = path.join(app.getPath('appData'), '.wacorp')) {
@@ -29,6 +31,7 @@ class Minecraft {
         this.minecraftPath = minecraftPath;
         this.win = win;
         this.authLibDir = path.join(this.minecraftPath, 'libraries', 'com', 'mojang', 'authlib', 'authlib-injector-1.2.7.jar');
+        this.isMinecraftLaunched = false;
     }
 
     private sendToRenderer(channel: string, ...args: unknown[]) {
@@ -90,7 +93,6 @@ class Minecraft {
 
         const launch = new Launch();
 
-        let started = false;
         let isOptionsCreated = false;
 
         let lastProgressUpdate = 0;
@@ -112,8 +114,10 @@ class Minecraft {
                 isOptionsCreated = true;
 
                 const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","file/WacoRP Part 1.zip","file/WacoRP Part 2.zip","file/WacoRP Part 3.zip"]\nlang:ru_ru`;
+                const ofContent = `ofShowGlErrors:false`;
 
                 await writeFile(path.join(this.minecraftPath, 'options.txt'), content, 'utf8');
+                await writeFile(path.join(this.minecraftPath, 'optionsof.txt'), ofContent, 'utf8');
             }
         });
 
@@ -161,20 +165,25 @@ class Minecraft {
         });
 
         launch.on('data', (e) => {
-            if (!started) {
-                started = true;
+            if (!this.isMinecraftLaunched) {
+                this.isMinecraftLaunched = true;
 
                 this.sendToRenderer("launcher:useProgressBar", false);
-                this.sendToRenderer("launcher:useLaunchButton", true, "Запущен");
+                this.sendToRenderer("launcher:useLaunchButton", app.isPackaged, "Запущен");
                 this.sendToRenderer("launcher:addNotification", "success", "Майнкрафт запущен");
+
+                if (launchOptions.hideLauncher) {
+                    this.win.hide();
+                }
             }
             log.info(e);
         })
 
         launch.on('close', code => {
             log.info(code);
-            started = false;
+            this.isMinecraftLaunched = false;
 
+            this.win.show();
             this.sendToRenderer("launcher:useLaunchButton", false, "Играть");
         });
 
@@ -183,6 +192,8 @@ class Minecraft {
 
             this.sendToRenderer("launcher:useLaunchButton", false, "Играть");
             this.sendToRenderer("launcher:addNotification", "error", "Неизвестная ошибка");
+
+            this.win.show();
         });
 
         const checker = new MinecraftChecker(this.win, this.minecraftPath);

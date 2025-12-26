@@ -10,6 +10,8 @@
 
     width: max-content;
 
+    pointer-events: none;
+
     &.success {
         background: #2ecc71;
         color: white;
