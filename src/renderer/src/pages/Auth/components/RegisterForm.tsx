@@ -59,7 +59,7 @@ const RegisterForm = ({setFormType}: RegisterFormProps) => {
             <h2>Регистрация аккаунта WacoRP</h2>
             <Input onChange={(e) => setUsername(e.target.value)} className={styles.input} type="text" placeholder="Введите ваш логин" minLength={3} maxLength={16}/>
             <Input onChange={(e) => setPassword(e.target.value)} className={styles.input} type="password" placeholder="Введите ваш пароль" minLength={8} maxLength={32}/>
-            <Textarea onChange={(e) => setRpHistory(e.target.value)} className={styles.textarea} placeholder="РП история вашего персонажа" minLength={100} maxLength={10000} />
+            <Textarea onChange={(e) => setRpHistory(e.target.value)} className={styles.textarea} placeholder="РП история вашего персонажа" minLength={100} maxLength={4000} />
             <SkinPicker skin={skinFile} setSkin={setSkinFile} />
 
             <div className={styles.checkbox}>

@@ -75,8 +75,8 @@ const validateCredentials = (username: string, password: string, rp_history?: st
     if (rp_history && rp_history.length < 100) {
         return "РП история должна содержать минимум 100 символов"
     }
-    if (rp_history && rp_history.length > 10000) {
-        return "РП история не может быть длиннее 10000 символов";
+    if (rp_history && rp_history.length > 4000) {
+        return "РП история не может быть длиннее 4000 символов";
     }
 
     return null;
