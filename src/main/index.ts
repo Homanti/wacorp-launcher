@@ -4,6 +4,7 @@ import Minecraft, {type launchOptions} from "./minecraft";
 import {promises as fs} from "node:fs";
 import os from "node:os";
 import log from 'electron-log';
+import {autoUpdater} from "electron-updater";
 
 log.transports.file.resolvePathFn = () => {
     const logDir = app.isPackaged
@@ -16,6 +17,8 @@ log.transports.console.level = 'debug';
 Object.assign(console, log.functions);
 
 log.info('App starting...');
+
+autoUpdater.checkForUpdatesAndNotify();
 
 const createWindow = () => {
     const win = new BrowserWindow({

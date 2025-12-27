@@ -15,9 +15,22 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "build:win": "npm run build && electron-builder --win --config",
+    "build:publish": "electron-vite build && electron-builder --publish always && gh release edit v%npm_package_version% --draft=false",
+
+    "release:patch": "npm version patch && npm run build:publish",
+    "release:minor": "npm version minor && npm run build:publish",
+    "release:major": "npm version major && npm run build:publish",
+
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "homanti",
+      "repo": "wacorp-launcher"
+    }
+  ],
   "dependencies": {
     "adm-zip": "^0.5.16",
     "axios": "^1.13.2",
