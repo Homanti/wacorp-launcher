@@ -10,6 +10,7 @@ import mc from "minecraftstatuspinger";
 import MinecraftChecker from "./MinecraftChecker";
 import log from "electron-log";
 import {formatSpeed, formatTime} from "./utils/formatUtils";
+import {existsSync} from "fs";
 
 export type launchOptions = {
     username: string;
@@ -93,7 +94,7 @@ class Minecraft {
 
         const launch = new Launch();
 
-        let isOptionsCreated = false;
+        const isOptionsCreated = existsSync(path.join(this.minecraftPath, 'options.txt'));
 
         let lastProgressUpdate = 0;
         let lastCheckUpdate = 0;
@@ -111,8 +112,6 @@ class Minecraft {
             }
 
             if (!isOptionsCreated) {
-                isOptionsCreated = true;
-
                 const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","file/WacoRP Part 1.zip","file/WacoRP Part 2.zip","file/WacoRP Part 3.zip"]\nlang:ru_ru`;
                 const ofContent = `ofShowGlErrors:false`;
 
