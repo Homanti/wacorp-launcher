@@ -8,13 +8,6 @@ import Avatar from "../Avatar/Avatar";
 import {useState} from "react";
 import PAGES from "../../../../config/pages.config";
 
-const routes = [
-    { path: PAGES.HOME, label: "Главная", icon: <Home />, end: true },
-    { path: PAGES.ACCOUNTS, label: "Аккаунты", icon: <User />, end: true },
-    { path: PAGES.SETTINGS, label: "Настройки", icon: <Settings />, end: true },
-    { path: "/fbi", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*" },
-];
-
 const Sidebar = () => {
     const { pathname } = useLocation();
     const fbiMatch = useMatch("/fbi/*");
@@ -23,6 +16,13 @@ const Sidebar = () => {
     const addNotification = useNotificationsStore(s => s.addNotification);
 
     const [clickCount, setClickCount] = useState(0);
+
+    const routes = [
+        { path: PAGES.HOME, label: "Главная", icon: <Home />, end: true },
+        { path: PAGES.ACCOUNTS, label: "Аккаунты", icon: <User />, end: true },
+        { path: PAGES.SETTINGS, label: "Настройки", icon: <Settings />, end: true },
+        { path: "/fbi", label: "Реестр ФБР", icon: <Siren />, match: "/fbi/*", visible: selectedAccount?.fbiAccess || false },
+    ];
 
     return (
         <div className={styles.sidebar}>
@@ -100,6 +100,8 @@ const Sidebar = () => {
             <nav className={styles.nav}>
                 {routes.map((route) => {
                     const isActive = route.match ? !!fbiMatch : (route.end ? pathname === route.path : pathname.startsWith(route.path));
+
+                    if (route.visible === false) return null;
 
                     return (
                         <NavLink key={route.path} to={route.path} end={route.end} className={styles.navItem}>

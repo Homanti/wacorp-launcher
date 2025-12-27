@@ -18,6 +18,7 @@ export type AuthAccount = {
 
     discordId?: string;
     accepted?: boolean;
+    fbiAccess?: boolean;
 };
 
 type AuthStore = {
@@ -43,8 +44,6 @@ type RefreshResponse = {
     user_id: number;
     access_token: string;
     refresh_token: string;
-    user_discord_id?: string;
-    user_accepted?: boolean;
 };
 
 let refreshPromise: Promise<AuthAccount | null> | null = null;
@@ -157,7 +156,8 @@ export const useAuthStore = create<AuthStore>()(
                         minecraftAccessToken: response.data.minecraft_access_token,
 
                         discordId: response.data.discord_id,
-                        accepted: response.data.accepted
+                        accepted: response.data.accepted,
+                        fbiAccess: response.data.fbi_access
                     };
                 } catch {
                     return null;
@@ -185,9 +185,6 @@ export const useAuthStore = create<AuthStore>()(
                             id: response.data.user_id ?? current.id,
                             accessToken: response.data.access_token,
                             refreshToken: response.data.refresh_token,
-
-                            discordId: response.data.user_discord_id,
-                            accepted: response.data.user_accepted,
                         };
 
                         set((s) => ({
@@ -290,9 +287,6 @@ export const useAuthStore = create<AuthStore>()(
                         username: username,
                         accessToken: response.data.access_token,
                         refreshToken: response.data.refresh_token,
-
-                        discordId: response.data.user_discord_id,
-                        accepted: response.data.user_accepted
                     };
 
                     set((state) => ({
@@ -421,9 +415,6 @@ export const useAuthStore = create<AuthStore>()(
                         username: username,
                         accessToken: response.data.access_token,
                         refreshToken: response.data.refresh_token,
-
-                        discordId: response.data.user_discord_id,
-                        accepted: response.data.user_accepted,
                     };
 
                     set((state) => ({
