@@ -19,7 +19,35 @@ Object.assign(console, log.functions);
 
 log.info('App starting...');
 
-autoUpdater.checkForUpdatesAndNotify();
+if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify();
+
+    autoUpdater.on('checking-for-update', () => {
+        log.info('Checking for update...');
+    });
+
+    autoUpdater.on('update-available', (info) => {
+        log.info('Update available:', info);
+    });
+
+    autoUpdater.on('update-not-available', (info) => {
+        log.info('Update not available:', info);
+    });
+
+    autoUpdater.on('error', (err) => {
+        log.error('Error in auto-updater:', err);
+    });
+
+    autoUpdater.on('download-progress', (progressObj) => {
+        log.info(`Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`);
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        log.info('Update downloaded:', info);
+    });
+} else {
+    log.info('Auto-updater disabled in development mode');
+}
 
 const createWindow = () => {
     const win = new BrowserWindow({
