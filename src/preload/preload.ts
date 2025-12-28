@@ -10,6 +10,8 @@ contextBridge.exposeInMainWorld('api', {
 
     delete: (what: "minecraft" | "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:delete', what),
 
+    updateSkin: () => ipcRenderer.invoke('launcher:updateSkin'),
+
     getServerStatus: async () => {
         return await ipcRenderer.invoke('launcher:getServerStatus');
     },

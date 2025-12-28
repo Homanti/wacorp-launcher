@@ -20,9 +20,19 @@ export const extractHead = async (skinUrl: string, outputSize: number = 64): Pro
     const headWidth = 8;
     const headHeight = 8;
 
+    const overlayX = 40;
+    const overlayY = 8;
+    const overlayWidth = 8;
+    const overlayHeight = 8;
+
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     ctx.drawImage(skinImg, headX, headY, headWidth, headHeight, 0, 0, outputSize, outputSize);
+
+    if (skinImg.height === 64) {
+        ctx.drawImage(skinImg, overlayX, overlayY, overlayWidth, overlayHeight, 0, 0, outputSize, outputSize);
+    }
 
     return canvas.toDataURL('image/png');
 };

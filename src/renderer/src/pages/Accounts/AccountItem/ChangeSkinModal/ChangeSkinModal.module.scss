@@ -1,0 +1,16 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3125rem;
+    justify-content: flex-end;
+
+    .primaryButton {
+        background: #0070f3;
+    }
+}

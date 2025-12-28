@@ -20,7 +20,7 @@ declare global {
             getServerStatus: () => Promise<number | boolean>;
 
             delete: (what: "minecraft" | "mods" | "resourcepacks") => Promise<void>;
-            deleteGameDir: () => Promise<void>;
+            updateSkin: () => Promise<void>;
 
             getTotalRam: () => Promise<number>;
 

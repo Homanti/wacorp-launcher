@@ -1,7 +1,7 @@
 import {useState} from "react";
 import styles from "./SkinPicker.module.scss";
 import {ArrowUpFromLine} from "lucide-react";
-import {useNotificationsStore} from "../../../../store/useNotificationsStore";
+import {useNotificationsStore} from "../../store/useNotificationsStore";
 
 type SkinPickerProps = {
     skin?: File;

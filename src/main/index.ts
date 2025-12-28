@@ -51,8 +51,8 @@ if (app.isPackaged) {
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 900,
-        height: 600,
+        width: 975,
+        height: 650,
         frame: false,
         webPreferences: {
             preload: path.join(__dirname, '../preload/preload.mjs'),
@@ -130,6 +130,10 @@ const createWindow = () => {
 
     ipcMain.handle('launcher:getServerStatus', async () => {
         return minecraft.getServerStatus();
+    })
+
+    ipcMain.handle('launcher:updateSkin', async () => {
+        await fs.rm(path.join(minecraft.minecraftPath, 'assets', 'skins'), {recursive: true, force: true})
     })
 
     return win;

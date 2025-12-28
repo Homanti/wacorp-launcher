@@ -11,7 +11,7 @@ function Avatar({username}: {username: string | undefined}) {
 
         (async () => {
             try {
-                const skinURL = `https://raw.githubusercontent.com/Homanti/wacorp-skins/refs/heads/main/skins/${username}.png`
+                const skinURL = `https://raw.githubusercontent.com/Homanti/wacorp-skins/refs/heads/main/skins/${username}.png?t=${Date.now()}`
                 const dataUrl = await extractHead(skinURL);
 
                 setAvatar(dataUrl);

@@ -38,6 +38,7 @@ type AuthStore = {
     validateAndRefresh: (accessToken: string, refreshToken: string) => Promise<AuthAccount | null>;
 
     logout: (username: string) => void;
+    changeSkin: (username: string, skinFile: File, skinModel: "classic" | "slim") => void;
 };
 
 type RefreshResponse = {
@@ -280,7 +281,15 @@ export const useAuthStore = create<AuthStore>()(
                 }
 
                 try {
-                    const response = await apiClient.post('/auth/login', { username, password });
+                    const formData = new URLSearchParams();
+                    formData.append('username', username);
+                    formData.append('password', password);
+
+                    const response = await apiClient.post('/auth/login', formData, {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    });
 
                     const account: AuthAccount = {
                         id: response.data.user_id,
@@ -494,6 +503,40 @@ export const useAuthStore = create<AuthStore>()(
                     useNotificationsStore.getState().addNotification({
                         type: "success",
                         text: "Вы вышли из аккаунта"
+                    });
+                }
+            },
+
+            changeSkin: async (username: string, skinFile: File, skinModel: "classic" | "slim") => {
+                const account = get().accounts.find(acc => acc.username === username);
+                if (!account) return;
+
+                const updatedAccount = await get().validateAndRefresh(account.accessToken, account.refreshToken);
+                if (!updatedAccount) return;
+
+                const formData = new FormData();
+                formData.append('skin_file', skinFile);
+                formData.append('skin_model', skinModel);
+
+                try {
+                    const response = await apiClient.post('/change_skin', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': `Bearer ${updatedAccount.accessToken}`
+                        }
+                    });
+
+                    if (response.status === 200) {
+                        useNotificationsStore.getState().addNotification({
+                            type: "success",
+                            text: "Вы успешно поменяли скин."
+                        });
+                    }
+                } catch (error) {
+                    console.error('Change skin error:', error);
+                    useNotificationsStore.getState().addNotification({
+                        type: "error",
+                        text: "Ошибка во время изменение скина."
                     });
                 }
             }
