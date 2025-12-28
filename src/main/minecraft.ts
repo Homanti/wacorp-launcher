@@ -209,7 +209,7 @@ class Minecraft {
 
     async getServerStatus() {
         try {
-            let result = await mc.lookup({ host: SERVER_IP, port: 25565 });
+            let result = await mc.lookup({ host: SERVER_IP });
 
             if (result?.status?.players) {
                 return result.status.players.online;
