@@ -5,6 +5,7 @@ import {promises as fs} from "node:fs";
 import os from "node:os";
 import log from 'electron-log';
 import pkg from 'electron-updater';
+
 const { autoUpdater } = pkg;
 
 log.transports.file.resolvePathFn = () => {
@@ -18,36 +19,6 @@ log.transports.console.level = 'debug';
 Object.assign(console, log.functions);
 
 log.info('App starting...');
-
-if (app.isPackaged) {
-    autoUpdater.checkForUpdatesAndNotify();
-
-    autoUpdater.on('checking-for-update', () => {
-        log.info('Checking for update...');
-    });
-
-    autoUpdater.on('update-available', (info) => {
-        log.info('Update available:', info);
-    });
-
-    autoUpdater.on('update-not-available', (info) => {
-        log.info('Update not available:', info);
-    });
-
-    autoUpdater.on('error', (err) => {
-        log.error('Error in auto-updater:', err);
-    });
-
-    autoUpdater.on('download-progress', (progressObj) => {
-        log.info(`Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`);
-    });
-
-    autoUpdater.on('update-downloaded', (info) => {
-        log.info('Update downloaded:', info);
-    });
-} else {
-    log.info('Auto-updater disabled in development mode');
-}
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -77,20 +48,16 @@ const createWindow = () => {
         BrowserWindow.fromWebContents(event.sender)?.close();
     });
 
-    ipcMain.handle('launcher:launch', (_event, launchOptions: launchOptions) => {
+    ipcMain.handle('minecraft:launch', (_event, launchOptions: launchOptions) => {
         minecraft.launchMinecraft(launchOptions);
     })
 
-    ipcMain.handle('launcher:openGameDir', async () => {
+    ipcMain.handle('minecraft:openGameDir', async () => {
         log.info('Opening game dir...');
         const dir = minecraft.minecraftPath;
 
         await fs.mkdir(dir, { recursive: true });
         await shell.openPath(dir);
-    })
-
-    ipcMain.handle('launcher:getTotalRam', async () => {
-        return os.totalmem() / 1024 / 1024;
     })
 
     ipcMain.handle('launcher:delete', async (_event, what: "minecraft" | "mods" | "resourcepacks") => {
@@ -128,13 +95,77 @@ const createWindow = () => {
         }
     })
 
-    ipcMain.handle('launcher:getServerStatus', async () => {
+    ipcMain.handle('minecraft:getServerStatus', async () => {
         return minecraft.getServerStatus();
+    })
+
+    ipcMain.handle('launcher:getTotalRam', async () => {
+        return os.totalmem() / 1024 / 1024;
     })
 
     ipcMain.handle('launcher:updateSkin', async () => {
         await fs.rm(path.join(minecraft.minecraftPath, 'assets', 'skins'), {recursive: true, force: true})
     })
+
+    ipcMain.handle('updater:checkForUpdates', async () => {
+        if (!app.isPackaged) return { available: false };
+        return await autoUpdater.checkForUpdates();
+    });
+
+    ipcMain.handle('updater:downloadUpdate', () => {
+        autoUpdater.downloadUpdate();
+    });
+
+    ipcMain.handle('updater:quitAndInstall', () => {
+        autoUpdater.quitAndInstall();
+    });
+
+    if (app.isPackaged) {
+        autoUpdater.autoDownload = false;
+        autoUpdater.autoInstallOnAppQuit = true;
+
+
+        autoUpdater.on('checking-for-update', () => {
+            log.info('Checking for update...');
+            win.webContents.send('updater:checking-for-update');
+        });
+
+        autoUpdater.on('update-available', (info) => {
+            log.info('Update available:', info);
+            win.webContents.send('updater:update-available', {
+                version: info.version,
+                releaseDate: info.releaseDate,
+                files: info.files
+            });
+        });
+
+        autoUpdater.on('update-not-available', (info) => {
+            log.info('Update not available:', info);
+            win.webContents.send('updater:update-not-available');
+        });
+
+        autoUpdater.on('error', (err) => {
+            log.error('Error in auto-updater:', err);
+            win.webContents.send('updater:error', err.message);
+        });
+
+        autoUpdater.on('download-progress', (progressObj) => {
+            log.info(`Downloaded ${progressObj.percent}%`);
+            win.webContents.send('updater:download-progress', {
+                percent: progressObj.percent,
+                bytesPerSecond: progressObj.bytesPerSecond,
+                transferred: progressObj.transferred,
+                total: progressObj.total
+            });
+        });
+
+        autoUpdater.on('update-downloaded', (info) => {
+            log.info('Update downloaded:', info);
+            win.webContents.send('updater:update-downloaded', {
+                version: info.version
+            });
+        });
+    }
 
     return win;
 };

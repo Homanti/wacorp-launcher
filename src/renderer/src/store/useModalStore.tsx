@@ -9,8 +9,10 @@ type ModalStore = {
 
     title?: string;
 
-    openModal: (content: ReactNode | null, title?: string) => void;
+    openModal: (content: ReactNode | null, title?: string, closeAvaliable?: boolean) => void;
     closeModal: () => void;
+
+    closeAvaliable?: boolean;
 }
 
 export const useModalStore = create<ModalStore>((set) => ({
@@ -20,7 +22,9 @@ export const useModalStore = create<ModalStore>((set) => ({
     setContent: (content) => set({ content }),
 
     title: undefined,
+    closeAvaliable: true,
 
-    openModal: (content, title) => set({ isOpened: true, content, title: title }),
+    openModal: (content, title, closeAvaliable) => set({ isOpened: true, content, title: title, closeAvaliable: closeAvaliable }),
+
     closeModal: () => set({ isOpened: false, content: null }),
 }));

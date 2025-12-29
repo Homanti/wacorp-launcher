@@ -2,6 +2,8 @@
     display: flex;
     flex-direction: column;
 
+    justify-content: space-between;
+
     background: var(--surface-color);
     height: 100%;
 
@@ -13,6 +15,11 @@
 
     width: 15.625rem;
     transition: width 0.3s ease;
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
 }
 
 .account {
@@ -108,4 +115,15 @@
             color: inherit;
         }
     }
+}
+
+.version {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border: 2px solid var(--border-color);
+
+    padding: 3px;
 }

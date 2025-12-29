@@ -6,13 +6,15 @@ type ProgressBarProps = {
 
     speed?: string,
     estimated?: string,
+
+    className?: string,
 };
 
-function ProgressBar({ percent, description, speed, estimated }: ProgressBarProps) {
+function ProgressBar({ percent, description, speed, estimated, className }: ProgressBarProps) {
     const indeterminate = percent === null;
 
     return (
-        <div className={styles.progressBar}>
+        <div className={`${styles.progressBar} ${className || ''}`}>
             <div
                 className={`${styles.progress} ${indeterminate ? styles.indeterminate : ''}`}
                 style={indeterminate ? undefined : { width: `${percent}%` }}

@@ -1,0 +1,39 @@
+.updateContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 0.9375rem;
+    padding: 15px 25px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--surface-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.progressBar {
+    width: 100%;
+
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+}
+
+.btnPrimary {
+    background: var(--accent-color);
+    color: var(--background-color);
+
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
