@@ -65,15 +65,17 @@ export function UpdateModal() {
 
     useEffect(() => {
         if (updateState === 'checking') {
-            openModal(<CheckingContent />, 'Проверка обновлений', false);
+            openModal(<CheckingContent />, 'Проверка обновлений');
         } else if (updateState === 'available') {
             openModal(<AvailableContent version={version} onDownload={handleDownload} />, 'Доступно обновление лаунчера', false);
         } else if (updateState === 'downloading') {
             openModal(<DownloadingContent percent={progress} speed={bytesPerSecond} />, 'Загрузка обновления лаунчера', false);
         } else if (updateState === 'ready') {
             openModal(<ReadyContent version={version} onInstall={handleInstall} />, 'Обновление лаунчера готово', false);
+        } else {
+            closeModal();
         }
-    }, [updateState, progress, version, bytesPerSecond, openModal]);
+    }, [updateState, progress, version, bytesPerSecond, openModal, closeModal]);
 
     return null;
 }
