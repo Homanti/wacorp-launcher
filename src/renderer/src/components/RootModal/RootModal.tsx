@@ -14,7 +14,7 @@ function RootModal() {
     const closeModal = useModalStore(s => s.closeModal);
     const closeAvaliable = useModalStore(s => s.closeAvaliable);
 
-    useClickOutside(modalRef, () => {if (isOpened) closeModal()}, closeAvaliable || closeAvaliable == undefined);
+    useClickOutside(modalRef, () => {if (isOpened) closeModal()}, closeAvaliable);
 
     return (
         <AnimatePresence>
@@ -33,7 +33,7 @@ function RootModal() {
                     >
                         <header className={styles.header}>
                             {title}
-                            {closeAvaliable || closeAvaliable == undefined && (
+                            {closeAvaliable && (
                                 <IconButton onClick={() => closeModal()}>
                                     <X />
                                 </IconButton>

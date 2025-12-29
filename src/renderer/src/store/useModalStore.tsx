@@ -24,7 +24,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     title: undefined,
 
     closeAvaliable: true,
-    openModal: (content, title, closeAvaliable) => set({ isOpened: true, content, title: title, closeAvaliable: closeAvaliable }),
+    openModal: (content, title, closeAvaliable) => set({ isOpened: true, content, title: title, closeAvaliable: closeAvaliable ?? true }),
 
     closeModal: () => set({ isOpened: false, content: null }),
 }));
