@@ -105,7 +105,7 @@ function DownloadingContent({ percent, speed }: { percent: number; speed: number
 
     return (
         <div className={styles.updateContent}>
-            <ProgressBar className={styles.progressBar} percent={percent} description={"Загрузка обновления"} speed={speedMB} />
+            <ProgressBar className={styles.progressBar} percent={percent} description={"Загрузка обновления"} speed={`Скорость установки ${speedMB} Mb/s.`} />
         </div>
     );
 }
