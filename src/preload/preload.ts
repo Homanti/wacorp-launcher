@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('api', {
     close: () => ipcRenderer.invoke('win:close'),
 
     minecraftLaunch: (launchOptions: launchOptions) => ipcRenderer.invoke('minecraft:launch', launchOptions),
-    openGameDir: () => ipcRenderer.invoke('launcher:openGameDir'),
+    openGameDir: () => ipcRenderer.invoke('minecraft:openGameDir'),
 
     delete: (what: "minecraft" | "mods" | "resourcepacks") => ipcRenderer.invoke('launcher:delete', what),
 

@@ -11,6 +11,7 @@ import MinecraftChecker from "./MinecraftChecker";
 import log from "electron-log";
 import {formatSpeed, formatTime} from "./utils/formatUtils";
 import {existsSync} from "fs";
+import createServersDat from "./utils/createServersDat";
 
 export type launchOptions = {
     username: string;
@@ -94,7 +95,8 @@ class Minecraft {
 
         const launch = new Launch();
 
-        const isOptionsCreated = existsSync(path.join(this.minecraftPath, 'options.txt'));
+        const isOptionsExists = existsSync(path.join(this.minecraftPath, 'options.txt'));
+        const isServersDataExists = existsSync(path.join(this.minecraftPath, 'servers.dat'));
 
         let lastProgressUpdate = 0;
         let lastCheckUpdate = 0;
@@ -111,7 +113,7 @@ class Minecraft {
                 this.sendToRenderer("launcher:useLaunchButton", true, "Установка...");
             }
 
-            if (!isOptionsCreated) {
+            if (!isOptionsExists) {
                 const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","file/WacoRP Part 1.zip","file/WacoRP Part 2.zip","file/WacoRP Part 3.zip"]\nlang:ru_ru`;
                 const ofContent = `ofShowGlErrors:false`;
 
@@ -204,6 +206,18 @@ class Minecraft {
         this.sendToRenderer("launcher:useLaunchButton", true, "Запуск...");
 
         log.info('Launching minecraft...');
+
+        if (!isServersDataExists) {
+            const servers = [
+                { name: 'WacoRP (прокси)', ip: 'wacorp.joinserver.xyz' },
+                { name: 'WacoRP (резерв, без прокси)', ip: 'n25.joinserver.xyz:25688' }
+            ];
+
+            createServersDat(servers, path.join(this.minecraftPath, 'servers.dat'))
+                .then(() => console.log('servers.dat created successfully.'))
+                .catch(err => console.error('Error: ', err));
+        }
+
         await launch.Launch(opt);
     }
 
