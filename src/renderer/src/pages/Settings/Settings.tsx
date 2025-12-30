@@ -25,7 +25,7 @@ const Settings = () => {
             const total = await window.api.getTotalRam();
             setTotalRam(Math.round(total));
 
-            const next = selectedRam === 0 ? Math.floor(total / 2) : selectedRam;
+            const next = selectedRam === 0 ? Math.max(Math.floor((total || 0) / 2), MIN_RAM) : selectedRam;
             setSelectedRam(next);
             setRamInputValue(String(next));
         })();
