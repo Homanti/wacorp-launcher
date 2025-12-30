@@ -170,14 +170,29 @@ const createWindow = () => {
     return win;
 };
 
-app.whenReady().then(() => {
-    createWindow();
-    Menu.setApplicationMenu(!app.isPackaged ? Menu.buildFromTemplate([{role: "toggleDevTools"}]) : null);
+const gotTheLock = app.requestSingleInstanceLock();
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        const windows = BrowserWindow.getAllWindows();
+        if (windows.length > 0) {
+            const win = windows[0];
+            if (win.isMinimized()) win.restore();
+            win.focus();
+        }
     });
-});
+
+    app.whenReady().then(() => {
+        createWindow();
+        Menu.setApplicationMenu(!app.isPackaged ? Menu.buildFromTemplate([{role: "toggleDevTools"}]) : null);
+
+        app.on('activate', () => {
+            if (BrowserWindow.getAllWindows().length === 0) createWindow();
+        });
+    });
+}
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
