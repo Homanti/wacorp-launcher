@@ -126,6 +126,13 @@ class Minecraft {
             this.sendToRenderer("launcher:setProgressBarEstimated", `Осталось примерно ${formattedTime}.`);
         })
 
+        // модифицированный minecraft-java-core
+        launch.on('download-status', (fileName: string, url: string, type?: string) => {
+            log.info(`Installing: ${fileName}`);
+            log.info(`URL: ${url}`);
+            if (type) log.info(`Type: ${type}`);
+        });
+
         launch.on('check', (progress, size, element) => {
             const now = Date.now();
 

@@ -9,6 +9,8 @@ import {discordRPC} from "./utils/DiscordRPCManager";
 
 const { autoUpdater } = pkg;
 
+log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+log.transports.file.maxSize = 1024 * 1024 * 100;
 log.transports.file.resolvePathFn = () => {
     const logDir = app.isPackaged
         ? path.join(process.resourcesPath, 'logs')
