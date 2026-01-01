@@ -52,7 +52,7 @@ class Minecraft {
         const opt: LaunchOPTS = {
             timeout: 30000,
             path: this.minecraftPath,
-            // url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
+            url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
             authenticator: {
                 access_token: accessToken,
                 client_token: accessToken,
