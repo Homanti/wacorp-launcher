@@ -8,6 +8,7 @@ import Avatar from "../Avatar/Avatar";
 import {useState} from "react";
 import PAGES from "../../../../config/pages.config";
 import { version } from "../../../../../package.json";
+import isNewYearPeriod from "../../utils/IsNewYearPeriod";
 
 const Sidebar = () => {
     const { pathname } = useLocation();
@@ -127,6 +128,9 @@ const Sidebar = () => {
 
             <div className={styles.version}>
                 {version}
+                {isNewYearPeriod() && (
+                    <span>Новогодняя версия</span>
+                )}
             </div>
         </div>
     );

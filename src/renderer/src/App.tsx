@@ -1,8 +1,10 @@
-import { routes } from "./routes.tsx";
-import { useLocation } from "react-router-dom";
-import { useRoutes } from "react-router-dom";
+import {routes} from "./routes.tsx";
+import {useLocation, useRoutes} from "react-router-dom";
 import ElectronListeners from "./ElectronListeners";
 import {UpdateModal} from "./components/UpdateModal/UpdateModal";
+import Snow from "./components/Snow";
+import isNewYearPeriod from "./utils/IsNewYearPeriod";
+import NewYearCursor from "./components/NewYearCursor";
 
 function App() {
   const location = useLocation();
@@ -13,6 +15,13 @@ function App() {
         {element}
         <ElectronListeners />
         <UpdateModal />
+
+        {isNewYearPeriod() && (
+            <>
+                <Snow />
+                <NewYearCursor/>
+            </>
+        )}
     </>
   );
 }

@@ -12,6 +12,8 @@ import log from "electron-log";
 import {formatSpeed, formatTime} from "./utils/formatUtils";
 import {existsSync} from "fs";
 import createServersDat from "./utils/createServersDat";
+import {discordRPC} from "./utils/DiscordRPCManager";
+import {writeJsonFile} from "./utils/jsonUtils";
 
 export type launchOptions = {
     username: string;
@@ -22,13 +24,13 @@ export type launchOptions = {
 }
 
 class Minecraft {
-    version: {mc: string, forge: string};
+    version: {loader: string, mc: string, build: string};
     minecraftPath: string;
     authLibDir: string;
     isMinecraftLaunched: boolean;
     private win: BrowserWindow;
 
-    constructor(win: BrowserWindow,version = {mc: "1.20.1", forge: "47.4.13"}, minecraftPath = path.join(app.getPath('appData'), '.wacorp')) {
+    constructor(win: BrowserWindow,version = {loader: "forge", mc: "1.20.1", build: "47.4.13"}, minecraftPath = path.join(app.getPath('appData'), '.wacorp')) {
         this.version = version;
         this.minecraftPath = minecraftPath;
         this.win = win;
@@ -50,7 +52,7 @@ class Minecraft {
         const opt: LaunchOPTS = {
             timeout: 30000,
             path: this.minecraftPath,
-            url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
+            // url: "https://raw.githubusercontent.com/Homanti/wacorp-assets/refs/heads/main/assets_manifest.json",
             authenticator: {
                 access_token: accessToken,
                 client_token: accessToken,
@@ -68,8 +70,8 @@ class Minecraft {
             downloadFileMultiple: 10,
 
             loader: {
-                type: 'forge',
-                build: `${this.version.mc}-${this.version.forge}`,
+                type: this.version.loader,
+                build: `${this.version.mc}-${this.version.build}`,
                 enable: true
             },
 
@@ -111,14 +113,6 @@ class Minecraft {
 
                 this.sendToRenderer("launcher:useProgressBar", true, `Установка игры: ${element}`, percent)
                 this.sendToRenderer("launcher:useLaunchButton", true, "Установка...");
-            }
-
-            if (!isOptionsExists) {
-                const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","file/WacoRP Part 1.zip","file/WacoRP Part 2.zip","file/WacoRP Part 3.zip"]\nlang:ru_ru`;
-                const ofContent = `ofShowGlErrors:false`;
-
-                await writeFile(path.join(this.minecraftPath, 'options.txt'), content, 'utf8');
-                await writeFile(path.join(this.minecraftPath, 'optionsof.txt'), ofContent, 'utf8');
             }
         });
 
@@ -173,6 +167,8 @@ class Minecraft {
                 this.sendToRenderer("launcher:useLaunchButton", app.isPackaged, "Запущен");
                 this.sendToRenderer("launcher:addNotification", "success", "Майнкрафт запущен");
 
+                discordRPC.setPlayingActivity();
+
                 if (launchOptions.hideLauncher) {
                     this.win.hide();
                 }
@@ -186,6 +182,7 @@ class Minecraft {
 
             this.win.show();
             this.sendToRenderer("launcher:useLaunchButton", false, "Играть");
+            discordRPC.setIdleActivity();
         });
 
         launch.on('error', err => {
@@ -216,6 +213,13 @@ class Minecraft {
             createServersDat(servers, path.join(this.minecraftPath, 'servers.dat'))
                 .then(() => console.log('servers.dat created successfully.'))
                 .catch(err => console.error('Error: ', err));
+        }
+
+        if (!isOptionsExists) {
+            const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","modernlifepatch:modernlifepatch","file/WacoRP КСЭПСП.zip","file/Improved RUS Sodium translation.zip"]\nlang:ru_ru`;
+
+            await writeFile(path.join(this.minecraftPath, 'options.txt'), content, 'utf8');
+            await writeJsonFile(path.join(this.minecraftPath, 'config', 'chloride-client.json'), {fpsDisplayMode: "OFF"})
         }
 
         await launch.Launch(opt);

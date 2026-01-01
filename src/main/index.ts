@@ -5,6 +5,7 @@ import {promises as fs} from "node:fs";
 import os from "node:os";
 import log from 'electron-log';
 import pkg from 'electron-updater';
+import {discordRPC} from "./utils/DiscordRPCManager";
 
 const { autoUpdater } = pkg;
 
@@ -180,19 +181,26 @@ if (!gotTheLock) {
         if (windows.length > 0) {
             const win = windows[0];
             if (win.isMinimized()) win.restore();
+            if (!win.isVisible()) win.show();
             win.focus();
         }
     });
 
-    app.whenReady().then(() => {
+    app.whenReady().then(async () => {
         createWindow();
         Menu.setApplicationMenu(!app.isPackaged ? Menu.buildFromTemplate([{role: "toggleDevTools"}]) : null);
+
+        await discordRPC.connect();
 
         app.on('activate', () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindow();
         });
     });
 }
+
+app.on('before-quit', async () => {
+    await discordRPC.disconnect();
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

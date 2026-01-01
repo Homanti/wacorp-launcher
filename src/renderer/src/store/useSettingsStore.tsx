@@ -7,6 +7,9 @@ type SettingsState = {
 
     hideLauncher: boolean;
     setHideLauncher: (v: boolean) => void;
+
+    snowVisible: boolean;
+    setSnowVisible: (v: boolean) => void;
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -17,6 +20,9 @@ export const useSettingsStore = create<SettingsState>()(
 
             hideLauncher: false,
             setHideLauncher: (v) => set({ hideLauncher: v }),
+
+            snowVisible: true,
+            setSnowVisible: (v) => set({ snowVisible: v }),
         }),
         { name: "settings" }
     )

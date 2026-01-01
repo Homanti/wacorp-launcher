@@ -6,6 +6,8 @@ import {useSettingsStore} from "../../store/useSettingsStore";
 import {useAuthStore} from "../../store/useAuthStore";
 import {useEffect, useState} from "react";
 import {useNotificationsStore} from "../../store/useNotificationsStore";
+import Confetti from "../../components/Confetti";
+import isNewYearPeriod from "../../utils/IsNewYearPeriod";
 
 const Home = () => {
     const disabled = useLaunchButton(state => state.disabled);
@@ -18,6 +20,8 @@ const Home = () => {
     const [serverStatus, setServerStatus] = useState<number | boolean>(false);
 
     const addNotification = useNotificationsStore(s => s.addNotification);
+
+    const [showConfetti, setShowConfetti] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -64,6 +68,9 @@ const Home = () => {
                             }
 
                             if (data && data.uuid) {
+                                setShowConfetti(true);
+                                setTimeout(() => setShowConfetti(false), 3000);
+
                                 return window.api.minecraftLaunch({
                                     username: data.username,
                                     accessToken: data.minecraftAccessToken,
@@ -76,6 +83,10 @@ const Home = () => {
                                 disabled={disabled}>
                             <Play /> {text}
                         </Button>
+
+                        {isNewYearPeriod() && (
+                            <Confetti fire={showConfetti} />
+                        )}
                     </div>
                 </div>
             </section>

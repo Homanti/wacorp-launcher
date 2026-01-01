@@ -7,6 +7,7 @@ import {useModalStore} from "../../store/useModalStore";
 import DeleteModal from "./DeleteModal/DeleteModal";
 import {useNotificationsStore} from "../../store/useNotificationsStore";
 import {Gamepad2, MemoryStick, Trash2, Save, AppWindow} from "lucide-react";
+import isNewYearPeriod from "../../utils/IsNewYearPeriod";
 
 const Settings = () => {
     const [totalRam, setTotalRam] = useState<number>(0);
@@ -19,6 +20,9 @@ const Settings = () => {
 
     const hideLauncher = useSettingsStore(s => s.hideLauncher);
     const setHideLauncher = useSettingsStore(s => s.setHideLauncher);
+
+    const snowVisible = useSettingsStore(s => s.snowVisible);
+    const setSnowVisible = useSettingsStore(s => s.setSnowVisible);
 
     useEffect(() => {
         (async () => {
@@ -109,12 +113,23 @@ const Settings = () => {
                         <label>Настройки лаунчера не влияющие на игру.</label>
                         <div className={styles.actions}>
                             <div className={styles.checkbox}>
-                                <input type="checkbox" className={styles.checkbox} id="agree" onChange={(e) => setHideLauncher(e.target.checked)} checked={hideLauncher} />
-                                <label htmlFor="agree" className={styles.checkboxLabel}>
+                                <input type="checkbox" className={styles.checkbox} id="hidelauncher" onChange={(e) => setHideLauncher(e.target.checked)} checked={hideLauncher} />
+                                <label htmlFor="hidelauncher" className={styles.checkboxLabel}>
                                     Скрывать лаунчер после запуска майнкрафта
                                 </label>
                             </div>
                         </div>
+
+                        {isNewYearPeriod() && (
+                            <div className={styles.actions}>
+                                <div className={styles.checkbox}>
+                                    <input type="checkbox" className={styles.checkbox} id="showsnow" onChange={(e) => setSnowVisible(e.target.checked)} checked={snowVisible} />
+                                    <label htmlFor="showsnow" className={styles.checkboxLabel}>
+                                        Отображать снег
+                                    </label>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </li>
             </ul>
