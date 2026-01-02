@@ -9,15 +9,20 @@ export function UpdateModal() {
     const [progress, setProgress] = useState(0);
     const [version, setVersion] = useState('');
     const [bytesPerSecond, setBytesPerSecond] = useState(0);
+    const [disabled, setDisabled] = useState<boolean>(false);
 
     const { openModal, closeModal } = useModalStore();
 
     const handleDownload = () => {
+        setDisabled(true);
         window.updater.downloadUpdate();
+        setDisabled(false)
     };
 
     const handleInstall = () => {
+        setDisabled(true);
         window.updater.quitAndInstall();
+        setDisabled(false)
     };
 
     useEffect(() => {
@@ -67,15 +72,15 @@ export function UpdateModal() {
         if (updateState === 'checking') {
             openModal(<CheckingContent />, 'Проверка обновлений');
         } else if (updateState === 'available') {
-            openModal(<AvailableContent version={version} onDownload={handleDownload} />, 'Доступно обновление лаунчера', false);
+            openModal(<AvailableContent version={version} onDownload={handleDownload} disabled={disabled} />, 'Доступно обновление лаунчера', false);
         } else if (updateState === 'downloading') {
             openModal(<DownloadingContent percent={progress} speed={bytesPerSecond} />, 'Загрузка обновления лаунчера', false);
         } else if (updateState === 'ready') {
-            openModal(<ReadyContent version={version} onInstall={handleInstall} />, 'Обновление лаунчера готово', false);
+            openModal(<ReadyContent version={version} onInstall={handleInstall} disabled={disabled} />, 'Обновление лаунчера готово', false);
         } else {
             closeModal();
         }
-    }, [updateState, progress, version, bytesPerSecond, openModal, closeModal]);
+    }, [updateState, progress, version, bytesPerSecond, openModal, closeModal, disabled]);
 
     return null;
 }
@@ -89,11 +94,11 @@ function CheckingContent() {
     );
 }
 
-function AvailableContent({ version, onDownload }: { version: string; onDownload: () => void }) {
+function AvailableContent({ version, onDownload, disabled }: { version: string; onDownload: () => void, disabled: boolean }) {
     return (
         <div className={styles.updateContent}>
             <p>Доступна новая версия лаунчера <strong>{version}</strong></p>
-            <Button onClick={onDownload} className={styles.btnPrimary}>
+            <Button onClick={onDownload} className={styles.btnPrimary} disabled={disabled}>
                 Скачать обновление
             </Button>
         </div>
@@ -110,11 +115,11 @@ function DownloadingContent({ percent, speed }: { percent: number; speed: number
     );
 }
 
-function ReadyContent({ version, onInstall }: { version: string; onInstall: () => void }) {
+function ReadyContent({ version, onInstall, disabled }: { version: string; onInstall: () => void, disabled: boolean }) {
     return (
         <div className={styles.updateContent}>
             <p>Обновление до версии <strong>{version}</strong> загружено!</p>
-            <Button onClick={onInstall} className={styles.btnPrimary}>
+            <Button onClick={onInstall} className={styles.btnPrimary} disabled={disabled}>
                 Установить и перезапустить
             </Button>
         </div>

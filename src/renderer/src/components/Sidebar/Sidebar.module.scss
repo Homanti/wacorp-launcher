@@ -117,6 +117,14 @@
     }
 }
 
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.4375rem;
+}
+
 .version {
     display: flex;
     flex-direction: column;
@@ -124,7 +132,9 @@
     justify-content: center;
     align-items: center;
 
-    border: 2px solid var(--border-color);
+    width: 100%;
 
-    padding: 3px;
+    border: 0.125rem solid var(--border-color);
+
+    padding: 0.1875rem;
 }

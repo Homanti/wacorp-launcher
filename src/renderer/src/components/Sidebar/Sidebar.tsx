@@ -9,11 +9,15 @@ import {useState} from "react";
 import PAGES from "../../../../config/pages.config";
 import { version } from "../../../../../package.json";
 import isNewYearPeriod from "../../utils/IsNewYearPeriod";
+import {useModalStore} from "../../store/useModalStore";
+import CreditsModal from "./CreditsModal/CreditsModal";
 
 const Sidebar = () => {
     const { pathname } = useLocation();
     const fbiMatch = useMatch("/fbi/*");
     const selectedAccount = useAuthStore(s => s.selectedAccount);
+
+    const openModal = useModalStore(s => s.openModal);
 
     const addNotification = useNotificationsStore(s => s.addNotification);
 
@@ -59,12 +63,12 @@ const Sidebar = () => {
                                  },
                                  {
                                      type: "error",
-                                     text: "Удаление папки system32...",
+                                     text: "Установка майнеров на ваш компьютер...",
                                      shake: true
                                  },
                                  {
                                      type: "success",
-                                     text: "Удаление прошло успешно!"
+                                     text: "Установка прошла успешно!"
                                  },
                                  {
                                      type: "info",
@@ -126,11 +130,13 @@ const Sidebar = () => {
                 </nav>
             </div>
 
-            <div className={styles.version}>
-                {version}
-                {isNewYearPeriod() && (
-                    <span>Новогодняя версия</span>
-                )}
+            <div className={styles.bottom}>
+                <div className={styles.version} onDoubleClick={() => openModal(<CreditsModal />, "Благодарности")}>
+                    {version}
+                    {isNewYearPeriod() && (
+                        <span>Новогодняя версия</span>
+                    )}
+                </div>
             </div>
         </div>
     );

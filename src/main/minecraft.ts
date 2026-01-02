@@ -45,6 +45,8 @@ class Minecraft {
     }
     
     async launchMinecraft(launchOptions: launchOptions) {
+        this.sendToRenderer("launcher:useLaunchButton", true, "Запуск...");
+
         const username = launchOptions.username;
         const uuid = launchOptions.uuid;
         const accessToken = launchOptions.accessToken;
@@ -111,8 +113,8 @@ class Minecraft {
 
                 const percent = Number(((progress / size) * 100).toFixed(2));
 
-                this.sendToRenderer("launcher:useProgressBar", true, `Установка игры: ${element}`, percent)
-                this.sendToRenderer("launcher:useLaunchButton", true, "Установка...");
+                this.sendToRenderer("launcher:useProgressBar", true, `Скачивание игры: ${element}`, percent)
+                this.sendToRenderer("launcher:useLaunchButton", true, "Скачивание...");
             }
         });
 
@@ -207,7 +209,6 @@ class Minecraft {
         await checker.checkResourcePacks();
         await checker.checkPointBlank();
 
-        this.sendToRenderer("launcher:useLaunchButton", true, "Запуск...");
 
         log.info('Launching minecraft...');
 
