@@ -38,7 +38,7 @@ type AuthStore = {
     validateAndRefresh: (accessToken: string, refreshToken: string) => Promise<AuthAccount | null>;
 
     logout: (username: string) => void;
-    changeSkin: (username: string, skinFile: File, skinModel: "classic" | "slim") => void;
+    changeSkin: (username: string, skinFile: File) => void;
 };
 
 type RefreshResponse = {
@@ -105,7 +105,7 @@ export const useAuthStore = create<AuthStore>()(
                         (acc) => acc.username !== username
                     );
                     const newSelected = state.selectedAccount?.username === username
-                        ? newAccounts.at(-1) || null
+                        ? newAccounts[newAccounts.length] || null
                         : state.selectedAccount;
                     return { accounts: newAccounts, selectedAccount: newSelected };
                 }),
@@ -135,7 +135,7 @@ export const useAuthStore = create<AuthStore>()(
                 if (validated) {
                     set({ selectedAccount: validated });
                 } else {
-                    set({ selectedAccount: state.accounts.at(-1) ?? null });
+                    set({ selectedAccount: state.accounts[state.accounts.length] ?? null });
                 }
             },
 
@@ -223,7 +223,7 @@ export const useAuthStore = create<AuthStore>()(
 
                                 return {
                                     accounts: newAccounts,
-                                    selectedAccount: selectedRemoved ? newAccounts.at(-1) ?? null : s.selectedAccount,
+                                    selectedAccount: selectedRemoved ? newAccounts[newAccounts.length] ?? null : s.selectedAccount,
                                 };
                             });
                         }
@@ -507,7 +507,7 @@ export const useAuthStore = create<AuthStore>()(
                 }
             },
 
-            changeSkin: async (username: string, skinFile: File, skinModel: "classic" | "slim") => {
+            changeSkin: async (username: string, skinFile: File) => {
                 const account = get().accounts.find(acc => acc.username === username);
                 if (!account) return;
 
@@ -516,7 +516,6 @@ export const useAuthStore = create<AuthStore>()(
 
                 const formData = new FormData();
                 formData.append('skin_file', skinFile);
-                formData.append('skin_model', skinModel);
 
                 try {
                     const response = await apiClient.post('/change_skin', formData, {

@@ -6,7 +6,6 @@ import Button from "../../../components/Button/Button";
 import {useState} from "react";
 import {useAuthStore} from "../../../store/useAuthStore";
 import { motion } from "motion/react";
-import ToggleButton from "../../../components/ToggleSwitch/ToggleButton";
 import {SkinPicker} from "../../../components/SkinPicker/SkinPicker";
 
 type RegisterFormProps = {
@@ -23,12 +22,10 @@ const RegisterForm = ({setFormType}: RegisterFormProps) => {
     const [rpHistory, setRpHistory] = useState<string>("");
 
     const [skinFile, setSkinFile] = useState<File>();
-    const [isSlimEnabled, setIsSlimEnabled] = useState(false);
 
     const navigate = useNavigate();
 
     const [disabled, setDisabled] = useState(false);
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,7 +37,6 @@ const RegisterForm = ({setFormType}: RegisterFormProps) => {
         if (skinFile) {
             formData.append('skin_file', skinFile);
         }
-        formData.append("skin_model", isSlimEnabled ? "slim" : "classic");
 
         setDisabled(true);
 
@@ -66,7 +62,6 @@ const RegisterForm = ({setFormType}: RegisterFormProps) => {
             <Input onChange={(e) => setPassword(e.target.value)} className={styles.input} type="password" placeholder="Введите ваш пароль" minLength={8} maxLength={32}/>
             <Textarea onChange={(e) => setRpHistory(e.target.value)} className={styles.textarea} placeholder="РП история вашего персонажа" minLength={100} maxLength={4000} />
             <SkinPicker skin={skinFile} setSkin={setSkinFile} />
-            <ToggleButton checked={isSlimEnabled} onChange={setIsSlimEnabled}>Slim модель</ToggleButton>
 
             <div className={styles.checkbox}>
                 <input type="checkbox" className={styles.checkbox} id="agree" onChange={(e) => setIsChecked(e.target.checked)} />

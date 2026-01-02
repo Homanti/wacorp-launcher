@@ -1,5 +1,4 @@
 import {SkinPicker} from "../../../../components/SkinPicker/SkinPicker";
-import ToggleButton from "../../../../components/ToggleSwitch/ToggleButton";
 import {useState} from "react";
 import styles from "./ChangeSkinModal.module.scss";
 import Button from "../../../../components/Button/Button";
@@ -9,7 +8,6 @@ import {useAuthStore} from "../../../../store/useAuthStore";
 
 function ChangeSkinModal({username}: { username: string}) {
     const [skinFile, setSkinFile] = useState<File>();
-    const [isSlimEnabled, setIsSlimEnabled] = useState(false);
 
     const closeModal = useModalStore(s => s.closeModal)
     const changeSkin = useAuthStore(s => s.changeSkin);
@@ -23,7 +21,7 @@ function ChangeSkinModal({username}: { username: string}) {
 
         setDisabled(true);
 
-        await changeSkin(username, skinFile, isSlimEnabled ? "slim" : "classic");
+        await changeSkin(username, skinFile);
         await window.api.updateSkin();
 
         setDisabled(false);
@@ -34,7 +32,6 @@ function ChangeSkinModal({username}: { username: string}) {
     return (
         <form className={styles.content} onSubmit={handleSubmit}>
             <SkinPicker skin={skinFile} setSkin={setSkinFile} />
-            <ToggleButton checked={isSlimEnabled} onChange={setIsSlimEnabled}>Slim модель</ToggleButton>
 
             <div className={styles.actions}>
                 <Button onClick={closeModal}>Отмена</Button>
