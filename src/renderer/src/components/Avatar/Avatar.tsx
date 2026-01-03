@@ -1,30 +1,32 @@
 import placeholder from "../../assets/avatar-placeholder.png";
-import {useEffect, useState} from "react";
 import {extractHead} from "../../utils/extractHead";
 import styles from "./Avatar.module.scss";
+import apiClient from "../../utils/api";
+import useSWR from 'swr';
+
+const fetcher = async (username: string) => {
+    const response = await apiClient.get(`/api/skin/${username}`);
+    const { skinURL } = response.data;
+    return await extractHead(skinURL);
+};
 
 function Avatar({username}: {username: string | undefined}) {
-    const [avatar, setAvatar] = useState(placeholder);
-
-    useEffect(() => {
-        if (!username) return setAvatar(placeholder);
-
-        (async () => {
-            try {
-                const skinURL = `https://raw.githubusercontent.com/Homanti/wacorp-skins/refs/heads/main/skins/${username}.png?t=${Date.now()}`
-                const dataUrl = await extractHead(skinURL);
-
-                setAvatar(dataUrl);
-
-            } catch (error) {
-                console.error(error);
-                setAvatar(placeholder);
-            }
-        })();
-    }, [username]);
+    const { data: avatar, error, isLoading } = useSWR(
+        username ? `/avatar/${username}` : null,
+        () => fetcher(username!),
+        {
+            fallbackData: placeholder,
+            revalidateOnFocus: false,
+            onError: (err) => console.error('Avatar load error:', err)
+        }
+    );
 
     return (
-        <img className={styles.avatar} src={avatar} alt={"avatar"} />
+        <img
+            className={styles.avatar}
+            src={error || isLoading ? placeholder : (avatar || placeholder)}
+            alt={"avatar"}
+        />
     );
 }
 

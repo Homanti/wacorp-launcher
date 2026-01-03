@@ -5,6 +5,7 @@ import Button from "../../../../components/Button/Button";
 import {useModalStore} from "../../../../store/useModalStore";
 import {Save} from "lucide-react";
 import {useAuthStore} from "../../../../store/useAuthStore";
+import {mutate} from "swr";
 
 function ChangeSkinModal({username}: { username: string}) {
     const [skinFile, setSkinFile] = useState<File>();
@@ -22,7 +23,8 @@ function ChangeSkinModal({username}: { username: string}) {
         setDisabled(true);
 
         await changeSkin(username, skinFile);
-        await window.api.updateSkin();
+
+        await mutate(`/avatar/${username}`);
 
         setDisabled(false);
 

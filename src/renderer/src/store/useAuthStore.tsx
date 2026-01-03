@@ -518,7 +518,7 @@ export const useAuthStore = create<AuthStore>()(
                 formData.append('skin_file', skinFile);
 
                 try {
-                    const response = await apiClient.post('/change_skin', formData, {
+                    const response = await apiClient.post('/auth/change_skin', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                             'Authorization': `Bearer ${updatedAccount.accessToken}`
