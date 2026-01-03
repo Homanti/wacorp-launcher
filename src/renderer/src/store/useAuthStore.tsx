@@ -105,7 +105,7 @@ export const useAuthStore = create<AuthStore>()(
                         (acc) => acc.username !== username
                     );
                     const newSelected = state.selectedAccount?.username === username
-                        ? newAccounts[newAccounts.length] || null
+                        ? newAccounts[newAccounts.length - 1] || null
                         : state.selectedAccount;
                     return { accounts: newAccounts, selectedAccount: newSelected };
                 }),
@@ -135,7 +135,7 @@ export const useAuthStore = create<AuthStore>()(
                 if (validated) {
                     set({ selectedAccount: validated });
                 } else {
-                    set({ selectedAccount: state.accounts[state.accounts.length] ?? null });
+                    set({ selectedAccount: state.accounts[state.accounts.length - 1] ?? null });
                 }
             },
 
@@ -223,7 +223,7 @@ export const useAuthStore = create<AuthStore>()(
 
                                 return {
                                     accounts: newAccounts,
-                                    selectedAccount: selectedRemoved ? newAccounts[newAccounts.length] ?? null : s.selectedAccount,
+                                    selectedAccount: selectedRemoved ? newAccounts[newAccounts.length - 1] ?? null : s.selectedAccount,
                                 };
                             });
                         }
