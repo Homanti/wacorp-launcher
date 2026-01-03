@@ -106,10 +106,6 @@ const createWindow = () => {
         return os.totalmem() / 1024 / 1024;
     })
 
-    ipcMain.handle('launcher:updateSkin', async () => {
-        await fs.rm(path.join(minecraft.minecraftPath, 'assets', 'skins'), {recursive: true, force: true})
-    })
-
     ipcMain.handle('updater:checkForUpdates', async () => {
         if (!app.isPackaged) return { available: false };
         return await autoUpdater.checkForUpdates();

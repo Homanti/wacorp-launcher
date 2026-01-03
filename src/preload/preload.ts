@@ -26,8 +26,6 @@ contextBridge.exposeInMainWorld('api', {
         return await ipcRenderer.invoke('minecraft:getServerStatus');
     },
 
-    updateSkin: () => ipcRenderer.invoke('launcher:updateSkin'),
-
     getTotalRam: async () => {
         const ramInfo: number = await ipcRenderer.invoke('launcher:getTotalRam');
         return ramInfo;
