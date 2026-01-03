@@ -1,6 +1,11 @@
 {
   "name": "wacorp-launcher",
   "productName": "WacoRP Launcher",
+  "author": "Homanti",
+  "description": "Minecraft Launcher for WacoRP",
+  "bugs": {
+    "url": "https://discord.gg/v8BMjSt8aw"
+  },
   "build": {
     "win": {
       "icon": "./icon.png"
