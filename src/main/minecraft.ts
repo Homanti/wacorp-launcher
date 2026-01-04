@@ -94,7 +94,7 @@ class Minecraft {
                 max: launchOptions.dedicatedRam + 'M',
             },
 
-            JVM_ARGS: [`-javaagent:${this.authLibDir}=${API_URL}`]
+            JVM_ARGS: [`-javaagent:${this.authLibDir}=${API_URL}`],
         }
 
         const launch = new Launch();
@@ -214,8 +214,7 @@ class Minecraft {
 
         if (!isServersDataExists) {
             const servers = [
-                { name: 'WacoRP (прокси)', ip: 'wacorp.joinserver.xyz' },
-                { name: 'WacoRP (резерв, без прокси)', ip: 'n25.joinserver.xyz:25688' }
+                { name: 'WacoRP', ip: SERVER_IP },
             ];
 
             createServersDat(servers, path.join(this.minecraftPath, 'servers.dat'))

@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {useNotificationsStore} from "../../store/useNotificationsStore";
 import Confetti from "../../components/Confetti";
 import isNewYearPeriod from "../../utils/IsNewYearPeriod";
+import useServerStore from "../../store/useServerStore";
 
 const Home = () => {
     const disabled = useLaunchButton(state => state.disabled);
@@ -17,7 +18,8 @@ const Home = () => {
     const hideLauncher = useSettingsStore(s => s.hideLauncher);
     const selectedAccount = useAuthStore(s => s.selectedAccount);
 
-    const [serverStatus, setServerStatus] = useState<number | boolean>(false);
+    const serverStatus = useServerStore(s => s.serverStatus);
+    const setServerStatus = useServerStore(s => s.setServerStatus);
 
     const addNotification = useNotificationsStore(s => s.addNotification);
 
