@@ -209,7 +209,6 @@ class Minecraft {
         await checker.checkResourcePacks();
         await checker.checkPointBlank();
 
-
         log.info('Launching minecraft...');
 
         if (!isServersDataExists) {
@@ -223,7 +222,10 @@ class Minecraft {
         }
 
         if (!isOptionsExists) {
-            const content = `resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","modernlifepatch:modernlifepatch","file/WacoRP КСЭПСП.zip","file/Improved RUS Sodium translation.zip"]\nlang:ru_ru`;
+            const content = [
+                'resourcePacks:["vanilla","pointblank_resources","pfm-asset-resources","mod_resources","modernlifepatch:modernlifepatch","file/WacoRP КСЭПСП.zip"]',
+                'lang:ru_ru'
+            ].join('\n');
 
             await writeFile(path.join(this.minecraftPath, 'options.txt'), content, 'utf8');
             await writeJsonFile(path.join(this.minecraftPath, 'config', 'chloride-client.json'), {fpsDisplayMode: "OFF"})

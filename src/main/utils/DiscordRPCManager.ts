@@ -51,7 +51,6 @@ class DiscordRPCManager {
 
         this.client.user?.setActivity({
             details: `В игре`,
-            state: `🎄Отмечает новый год на WacoRP`,
             largeImageKey: 'icon',
             largeImageText: 'WacoRP',
             startTimestamp: this.timestamp,
